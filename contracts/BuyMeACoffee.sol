@@ -13,8 +13,8 @@ contract BuyMeACoffee {
     // Define a variable to track the number of coffees given
     uint256 public coffeeCount = 0;
 
-    // Define an array of `Coffee` structs
-    Coffee[] coffees;
+    // Define a mapping of `uint256` to `Coffee` structs
+    mapping(uint256 => Coffee) coffees;
 
     // Define a struct that will store info about each coffee.
     struct Coffee {
@@ -54,7 +54,7 @@ contract BuyMeACoffee {
         // Increment the coffee count
         coffeeCount ++;
         // Create the coffee
-        coffees.push(Coffee(msg.sender, block.timestamp, _message, _name, _amount));
+        coffees[coffeeCount] = Coffee(msg.sender, block.timestamp, _message, _name, _amount);
         //// Save the money in the contract (no code needed here)
         //(bool success,) = owner.call{value: msg.value}("");
         //require(success, "Failed to send money");
@@ -64,11 +64,54 @@ contract BuyMeACoffee {
     }
 
     // Define a function 'withdrawAll' that allows the owner to withdraw all the Ether in the contract
-    function withdrawAll() public payable {
+    function withdrawAll() external payable {
         // Make sure the sender is the owner
         require(msg.sender == owner, "The sender should be the owner");
         // Send all the Ether in the contract to the owner
         (bool success,) = owner.call{value: address(this).balance}("");
         require(success, "Failed to withdraw the money");
+    }
+
+    // list Coffee from coffees mapping by index and limit
+    function listCoffees(uint256 index, uint256 limit) external view returns (Coffee[] memory) {
+        // Make sure the index is greater than zero
+        require(index > 0, "The index should be greater than zero");
+        // Make sure the index is less than or equal to the coffee count
+        require(index <= coffeeCount, "The index should be less than or equal to the coffee count");
+        // Make sure the limit is greater than zero
+        require(limit > 0, "The limit should be greater than zero");
+        // Make sure the index is less than or equal to the coffee count
+        require(index <= coffeeCount, "The index should be less than or equal to the coffee count");
+        // Make sure the limit + index is less than or equal to the coffee count
+        if (limit + index > coffeeCount) {
+            limit = coffeeCount - index + 1;
+        }
+
+        // Create a new array of Coffee structs
+        Coffee[] memory _coffees = new Coffee[](limit - index + 1);
+        // Loop through the coffees
+        for (uint256 i = index; i <= limit; i++) {
+            // Get the coffee at the current index
+            Coffee memory coffee = coffees[i];
+
+            // Create a new coffee struct with only the specified attributes
+            Coffee memory newCoffee;
+            newCoffee.name = coffee.name;
+            newCoffee.message = coffee.message;
+            newCoffee.timestamp = coffee.timestamp;
+            newCoffee.amount = coffee.amount;
+
+            // Add the new coffee to the array
+            _coffees[i - index] = newCoffee;
+        }
+
+        // Return the array
+        return _coffees;
+    }
+
+    // Get the balance of the contract
+    function getBalance() external view returns (uint256) {
+        // This function reads the balance of the contract
+        return address(this).balance;
     }
 }
