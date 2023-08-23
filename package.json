@@ -1,0 +1,13 @@
+{
+  "name": "dbuymeacoffee",
+  "version": "0.1.0",
+  "description": "An Ethereum BuyMe A Coffee DApp",
+  "author": "ali.hichem@mail.com",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.3"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "chai-as-promised": "^7.1.1"
+  }
+}
