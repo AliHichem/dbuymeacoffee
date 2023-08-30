@@ -3,9 +3,9 @@
 import Link from "next/link";
 import {motion} from "framer-motion"
 
-import '../assets/css/icomoon.css'
-import '../assets/css/bootstrap.css'
-import '../assets/css/style.css'
+import '@/assets/css/icomoon.css'
+import '@/assets/css/bootstrap.css'
+import '@/assets/css/style.css'
 
 export default function Home({Component, pageProps, router}) {
 
@@ -42,7 +42,11 @@ export default function Home({Component, pageProps, router}) {
                                                 className="icon-linkedin2"></i></a></li>
                                             <li><a href="mailto:ali.hichem@mail.com"><i className="icon-email"></i></a>
                                             </li>
-                                            <li><Link href={'/buymeacoffee'}><i className="icon-cup"></i></Link>
+                                            <li><Link href={'/buymeacoffee'} legacyBehavior>
+                                                <a target="_blank">
+                                                    <i className="icon-cup"></i>
+                                                </a>
+                                            </Link>
                                             </li>
                                         </ul>
                                     </div>

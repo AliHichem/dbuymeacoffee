@@ -10,7 +10,8 @@
 * 	Template Style 
 *
 * ======================================================= */
-body {
+
+#page {
   font-family: "Space Mono", Arial, serif;
   font-weight: 400;
   font-size: 16px;
@@ -18,9 +19,6 @@ body {
   color: #4d4d4d;
   background: #fff;
 
-}
-
-#page {
   position: relative;
   overflow-x: hidden;
   width: 100%;
