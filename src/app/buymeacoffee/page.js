@@ -11,7 +11,7 @@ import ProfileCard from '@/components/ProfileCard';
 import {PrimaryButton} from '@/components/Button';
 import Card from '@/components/Card';
 
-import { useInterval } from '@/lib/useInterval';
+import {useInterval} from '@/lib/useInterval';
 
 import {
     userSession,
@@ -24,6 +24,9 @@ import {
     authenticate
 } from '@/lib';
 import {IconWallet} from "@tabler/icons";
+import Web3Modal from "web3modal";
+import {providerOptions} from "@/app/providerOptions";
+import AuthButton from "@/components/AuthButton";
 
 export default function Page() {
 
@@ -33,6 +36,92 @@ export default function Page() {
     const [name, setName] = useState('');
     const [price, setPrice] = useState(3);
     const [message, setMessage] = useState('');
+    // const [provider, setProvider] = useState(null);
+    // const [network, setNetwork] = useState('');
+
+    //#########################################################
+    //############## handle wallet connect ####################
+    //#########################################################
+
+    const [provider, setProvider] = useState();
+    const [library, setLibrary] = useState();
+    const [account, setAccount] = useState();
+    const [error, setError] = useState("");
+    const [chainId, setChainId] = useState();
+    const [network, setNetwork] = useState();
+    const [verified, setVerified] = useState();
+
+    const connectWallet = async () => {
+        try {
+            const provider = await web3Modal.connect();
+            const library = new ethers.providers.Web3Provider(provider);
+            const accounts = await library.listAccounts();
+            const network = await library.getNetwork();
+            setProvider(provider);
+            setLibrary(library);
+            if (accounts) setAccount(accounts[0]);
+            setChainId(network.chainId);
+        } catch (error) {
+            setError(error);
+        }
+    };
+
+    const refreshState = () => {
+        setAccount();
+        setChainId();
+        setNetwork("");
+        setVerified(undefined);
+    };
+
+    const disconnect = async () => {
+        await web3Modal.clearCachedProvider();
+        refreshState();
+    };
+
+    useEffect(() => {
+        if (web3Modal.cachedProvider) {
+            connectWallet();
+        }
+    }, []);
+
+    useEffect(() => {
+        if (provider?.on) {
+            const handleAccountsChanged = (accounts) => {
+                console.log("accountsChanged", accounts);
+                if (accounts) setAccount(accounts[0]);
+            };
+
+            const handleChainChanged = (_hexChainId) => {
+                setChainId(_hexChainId);
+            };
+
+            const handleDisconnect = () => {
+                console.log("disconnect", error);
+                disconnect();
+            };
+
+            provider.on("accountsChanged", handleAccountsChanged);
+            provider.on("chainChanged", handleChainChanged);
+            provider.on("disconnect", handleDisconnect);
+
+            return () => {
+                if (provider.removeListener) {
+                    provider.removeListener("accountsChanged", handleAccountsChanged);
+                    provider.removeListener("chainChanged", handleChainChanged);
+                    provider.removeListener("disconnect", handleDisconnect);
+                }
+            };
+        }
+    }, [provider]);
+
+    const web3Modal = new Web3Modal({
+        cacheProvider: true, // optional
+        providerOptions // required
+    });
+
+    //#########################################################
+    //############## handle coffees donations #################
+    //#########################################################
 
     useEffect(() => setMounted(true), []);
 
@@ -46,6 +135,7 @@ export default function Page() {
     // - On call success we display a toast message and add the incoming transaction to our existing list of transactions
     const handleSubmit = async e => {
         e.preventDefault();
+        if(!account) return;
 
         // FunctionArgs
         // - args that we pass to the smart contract - message, name and price.
@@ -137,17 +227,26 @@ export default function Page() {
     };
 
 
-    useEffect(() => {
-        const initializeProvider = async () => {
-            if (window.ethereum) {
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                setProvider(provider);
-            }
-        };
-
-        initializeProvider();
-    }, []);
+    // useEffect(() => {
+    //     const initializeProvider = async () => {
+    //         if (window.ethereum) {
+    //             await window.ethereum.request({method: 'eth_requestAccounts'});
+    //             const provider = new ethers.providers.Web3Provider(window.ethereum);
+    //             console.log('provider', provider);
+    //             setProvider(provider);
+    //         }
+    //     };
+    //
+    //     initializeProvider();
+    //     const getNetwork = async () => {
+    //         if (provider) {
+    //             const network = await provider.getNetwork();
+    //             setNetwork(network.name);
+    //         }
+    //     };
+    //
+    //     getNetwork();
+    // }, [provider]);
 
 
     // // Fetching data on page load
@@ -168,13 +267,21 @@ export default function Page() {
     // }, 5 * 1000);
 
 
+    // export const Conditional = ({ condition, childrenTrue, childrenFalse }) => {
+    //     if (condition) {
+    //         return <>(childrenTrue)</>;
+    //     } else {
+    //         return <>(childrenFalse)</>;
+    //     }
+    // };
+
     return (
         <>
-            <AppNavbar/>
+            <AppNavbar account={account} connectWallet={connectWallet} disconnect={disconnect}/>
             <Container>
                 <div className="mx-auto mt-8">
                     <div className="text-lg font-medium leading-6 text-gray-900 flex space-x-2">
-                        <div>Building a full-stack dapp on Stacks</div>
+                        <div>Hey there !</div>
                     </div>
                     <div className="mt-2 text-sm text-zinc-700 max-w-2xl">
                         This is a demo app on how to build an simple dapp with Solidity smart contracts
@@ -296,15 +403,10 @@ export default function Page() {
                                         placeholder="Thank you for the support. Feel free to leave a comment below. It could be anything – appreciation, information or even humor ... (optional)"
                                         label="Message"
                                     />
-                                    {mounted && userSession.isUserSignedIn() ? (
+                                    {account ? (
                                         <PrimaryButton type="submit">Support with Ӿ{price}</PrimaryButton>
                                     ) : (
-                                        <PrimaryButton onClick={authenticate} type="button">
-                                            <div className="flex space-x-2 items-center">
-                                                <IconWallet className="h-5 w-6"/>
-                                                <div>Authenticate</div>
-                                            </div>
-                                        </PrimaryButton>
+                                        <AuthButton account={account} connectWallet={connectWallet} disconnect={disconnect}/>
                                     )}
                                 </form>
                             </div>

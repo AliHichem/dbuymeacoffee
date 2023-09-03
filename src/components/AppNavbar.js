@@ -1,14 +1,9 @@
-import {PrimaryButton} from './Button';
 import Container from './Container';
-import Dropdown from './Dropdown';
-import {authenticate, userSession} from '@/lib';
+// import {authenticate, userSession} from '@/lib';
 import Link from 'next/link';
-import {useEffect, useState} from 'react';
-import {IconWallet} from '@tabler/icons';
+import AuthButton from './AuthButton';
 
-export default function AppNavbar() {
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => setMounted(true), []);
+export default function AppNavbar({account, connectWallet, disconnect}) {
 
     return (
         <div className="bg-white">
@@ -24,16 +19,7 @@ export default function AppNavbar() {
                         </div>
                     </Link>
                     <div className="flex justify-center space-x-6 md:order-2">
-                        {mounted && userSession.isUserSignedIn() ? (
-                            <Dropdown/>
-                        ) : (
-                            <PrimaryButton onClick={authenticate}>
-                                <div className="flex space-x-2 items-center">
-                                    <IconWallet className="h-5 w-6"/>
-                                    <div>Authenticate</div>
-                                </div>
-                            </PrimaryButton>
-                        )}
+                        <AuthButton account={account} connectWallet={connectWallet} disconnect={disconnect}/>
                     </div>
                 </div>
             </Container>

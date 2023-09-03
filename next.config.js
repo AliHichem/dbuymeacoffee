@@ -1,20 +1,11 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: false,
+    reactStrictMode: true,
+    webpack: config => {
+        config.resolve.fallback = { fs: false, net: false, tls: false };
+        return config;
+    }
 }
 
 module.exports = nextConfig
-
-// const webpack = require('webpack');
-//
-// module.exports = {
-//     webpack: (config, { dev }) => {
-//         config.plugins.push(
-//             new webpack.ProvidePlugin({
-//                 '$': 'jquery',
-//                 'jQuery': 'jquery',
-//             })
-//         )
-//         return config
-//     }
-// }
