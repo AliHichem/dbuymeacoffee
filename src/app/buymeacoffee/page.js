@@ -1,7 +1,7 @@
 'use client'
 
 import {useState, useEffect} from 'react';
-import ethers from "ethers";
+import {ethers} from "ethers";
 
 import AppNavbar from '@/components/AppNavbar';
 import Container from '@/components/Container';
@@ -25,7 +25,7 @@ import {
 } from '@/lib';
 import {IconWallet} from "@tabler/icons";
 import Web3Modal from "web3modal";
-import {providerOptions} from "@/app/providerOptions";
+import {providers} from "@/app/providers";
 import AuthButton from "@/components/AuthButton";
 
 export default function Page() {
@@ -50,18 +50,22 @@ export default function Page() {
     const [chainId, setChainId] = useState();
     const [network, setNetwork] = useState();
     const [verified, setVerified] = useState();
-
     const connectWallet = async () => {
         try {
+            const account = sessionStorage.getItem('account');
             const provider = await web3Modal.connect();
             const library = new ethers.providers.Web3Provider(provider);
             const accounts = await library.listAccounts();
             const network = await library.getNetwork();
             setProvider(provider);
             setLibrary(library);
-            if (accounts) setAccount(accounts[0]);
+            if (accounts) {
+                setAccount(accounts[0]);
+                sessionStorage.setItem('account', account);
+            }
             setChainId(network.chainId);
         } catch (error) {
+            console.error(error);
             setError(error);
         }
     };
@@ -71,6 +75,7 @@ export default function Page() {
         setChainId();
         setNetwork("");
         setVerified(undefined);
+        sessionStorage.removeItem('account');
     };
 
     const disconnect = async () => {
@@ -92,6 +97,7 @@ export default function Page() {
             };
 
             const handleChainChanged = (_hexChainId) => {
+                console.log("chainChanged", _hexChainId);
                 setChainId(_hexChainId);
             };
 
@@ -116,7 +122,8 @@ export default function Page() {
 
     const web3Modal = new Web3Modal({
         cacheProvider: true, // optional
-        providerOptions // required
+        providerOptions: providers, // required
+        theme: "dark"
     });
 
     //#########################################################

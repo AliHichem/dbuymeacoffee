@@ -1,11 +1,11 @@
 import WalletConnect from "@walletconnect/web3-provider";
 import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
 
-export const providerOptions = {
+export const providers = {
     walletlink: {
         package: CoinbaseWalletSDK, // Required
         options: {
-            appName: "Web 3 Modal Demo", // Required
+            appName: "Buy me a coffee", // Required
             infuraId: process.env.INFURA_KEY // Required unless you provide a JSON RPC url; see `rpc` below
         }
     },
@@ -15,4 +15,5 @@ export const providerOptions = {
             infuraId: process.env.INFURA_KEY // required
         }
     }
+
 };
