@@ -28,6 +28,11 @@ import Web3Modal from "web3modal";
 import {providers} from "@/app/providers";
 import AuthButton from "@/components/AuthButton";
 
+import abi from "@/abis/BuyMeACoffee.json"
+
+const contractAddress = '0x1bf383351eDb6FFE4cE48602Bc9928280E1f4401';
+const contractABI = abi.abi;
+
 export default function Page() {
 
     const [mounted, setMounted] = useState(false);
@@ -36,27 +41,32 @@ export default function Page() {
     const [name, setName] = useState('');
     const [price, setPrice] = useState(3);
     const [message, setMessage] = useState('');
-    // const [provider, setProvider] = useState(null);
-    // const [network, setNetwork] = useState('');
 
     //#########################################################
     //############## handle wallet connect ####################
     //#########################################################
 
-    const [provider, setProvider] = useState();
+    const [provider, setProvider] = useState(null);
     const [library, setLibrary] = useState();
-    const [account, setAccount] = useState();
+    let [account, setAccount] = useState(null);
     const [error, setError] = useState("");
     const [chainId, setChainId] = useState();
     const [network, setNetwork] = useState();
     const [verified, setVerified] = useState();
+    const [ethereum, setEthereum] = useState(undefined);
+    const [contract, setContract] = useState(null);
+    const [events, setEvents] = useState([]);
+
     const connectWallet = async () => {
         try {
-            const account = sessionStorage.getItem('account');
+            account = sessionStorage.getItem('account');
             const provider = await web3Modal.connect();
             const library = new ethers.providers.Web3Provider(provider);
             const accounts = await library.listAccounts();
             const network = await library.getNetwork();
+            const signer = library.getSigner();
+            const contract = new ethers.Contract(contractAddress, contractABI, signer);
+            setContract(contract);
             setProvider(provider);
             setLibrary(library);
             if (accounts) {
@@ -65,7 +75,7 @@ export default function Page() {
             }
             setChainId(network.chainId);
         } catch (error) {
-            console.error(error);
+            console.log('>>> error', error);
             setError(error);
         }
     };
@@ -84,9 +94,11 @@ export default function Page() {
     };
 
     useEffect(() => {
-        if (web3Modal.cachedProvider) {
-            connectWallet();
-        }
+        (async () => {
+            if (web3Modal.cachedProvider) {
+                await connectWallet();
+            }
+        })();
     }, []);
 
     useEffect(() => {
@@ -132,86 +144,39 @@ export default function Page() {
 
     useEffect(() => setMounted(true), []);
 
-    const handleMessageChange = e => setMessage(emojiStrip(e.target.value));
+    // const handleMessageChange = e => setMessage(emojiStrip(e.target.value));
+    const handleMessageChange = e => setMessage(e.target.value);
     const handleNameChange = e => setName(e.target.value);
     const handlePriceChange = e => setPrice(Math.floor(e.target.value));
 
     // Sending a coffee donation with a message and name
     // - This method submits a transaction to the contract address with a contract call 'buy-coffee'
-    // - We make the call using `openContractCall` function from `@stacks/connect`
     // - On call success we display a toast message and add the incoming transaction to our existing list of transactions
     const handleSubmit = async e => {
         e.preventDefault();
-        if(!account) return;
 
-        // FunctionArgs
-        // - args that we pass to the smart contract - message, name and price.
-        const functionArgs = [
-            stringUtf8CV(message),
-            stringUtf8CV(name),
-            uintCV(price * ONE_MILLION)
-        ];
+        if (!account) return;
 
-        // PostCondition is a safety feature of the clarity smart contracts
-        // - To learn more I recommend this article by Kenny Rogers - https://dev.to/stacks/understanding-stacks-post-conditions-e65
+        try {
+            await contract.giveCoffee(message, name, price, {
+                // from: account,
+                // value: ethers.utils.parseUnits("0.11","ether")
+                value: String(0.11 * 1000000000000000000)
+            });
+        } catch (error) {
+            console.error(error);
+        }
 
-        const postConditionAddress = userSession.loadUserData().profile.stxAddress.testnet;
-        const postConditionCode = FungibleConditionCode.LessEqual;
-        const postConditionAmount = price * ONE_MILLION;
-
-        const postConditions = [
-            makeStandardSTXPostCondition(
-                postConditionAddress,
-                postConditionCode,
-                postConditionAmount
-            )
-        ];
-
-        const options = {
-            contractAddress,
-            contractName: 'coffee',
-            functionName: 'buy-coffee',
-            functionArgs,
-            network,
-            postConditions,
-            appDetails,
-            onFinish: data => {
-                toast.success('Thank you for a coffee');
-                setTxs([
-                    {
-                        id: data.txId,
-                        timestamp: null,
-                        sender: null,
-                        name,
-                        amount: price,
-                        message,
-                        txStatus: 'pending'
-                    },
-                    ...txs
-                ]);
-            }
-        };
-
-        await openContractCall(options);
     };
 
-    // Fetching list of messages
-    // - This method fetches the transactions from the contract address.
-    // - You can find a full API documentation here: https://docs.hiro.so/api#tag/Accounts/operation/get_account_transactions
-    // - The `mapResultsFromTx` method is used to map the raw transaction data to the data we need.
-    // - The `setTxs` method is used to update the state with the new data.
+    // Fetching list of coffees
     const listCoffees = async () => {
-        // https://docs.hiro.so/api#tag/Accounts/operation/get_account_transactions
-        console.log('fetching transactions ...');
-        const res = await fetch(
-            `${network.coreApiUrl}/extended/v1/address/${contractAddress}.coffee/transactions`
-        );
-        const result = await res.json();
-
-        console.log('results:', result.results);
-
-        const mappedTxs = mapResultsFromTx(result.results);
-        setTxs(mappedTxs);
+        const coffeeCount = await contract.coffeeCount();
+        if (coffeeCount > 0) {
+            const donors = await contract.listCoffees(1, 10);
+            setSupporters(coffeeCount);
+            setTxs(donors);
+        }
     };
 
     // Fetching number of supporters
@@ -233,36 +198,40 @@ export default function Page() {
         setSupporters(parsedValue);
     };
 
+    // Fetching data on page load
+    useEffect(() => {
+        if (contract) {
+            listCoffees();
+        }
 
-    // useEffect(() => {
-    //     const initializeProvider = async () => {
-    //         if (window.ethereum) {
-    //             await window.ethereum.request({method: 'eth_requestAccounts'});
-    //             const provider = new ethers.providers.Web3Provider(window.ethereum);
-    //             console.log('provider', provider);
-    //             setProvider(provider);
-    //         }
-    //     };
-    //
-    //     initializeProvider();
-    //     const getNetwork = async () => {
-    //         if (provider) {
-    //             const network = await provider.getNetwork();
-    //             setNetwork(network.name);
-    //         }
-    //     };
-    //
-    //     getNetwork();
-    // }, [provider]);
+        const subscribeToEvents = async () => {
+            if (contract) {
+                contract.on('CoffeeGiven', (giver, timestamp, message, name, amount) => {
+                    // add a new donor to donors list
+                    setTxs(prevState => {
+                        return [
+                            {
+                                timestamp: timestamp.toString(),
+                                message: message,
+                                name: name,
+                                amount: amount.toString()
+                            },
+                            ...prevState
+                        ];
+                    });
+                });
+            }
+        };
 
+        subscribeToEvents();
 
-    // // Fetching data on page load
-    // useEffect(() => {
-    //     listCoffees();
-    //     if (userSession.isUserSignedIn()) {
-    //         getSupporterCounter();
-    //     }
-    // }, []);
+        return () => {
+            if (contract) {
+                contract.removeAllListeners();
+            }
+        };
+
+    }, [contract]);
 
     // // Fetching data every 60 seconds
     // useInterval(() => {
@@ -320,31 +289,32 @@ export default function Page() {
                                 <div className="font-semibold text-base text-zinc-800">
                                     Recent supporters {supporters && `(${supporters})`}
                                 </div>
-                                {txs?.map(tx => (
+                                {txs?.map((tx, index) => (
                                     <div
-                                        key={tx.id}
+                                        key={index}
                                         className="flex border-b last:border-b-0 py-4 space-x-4 items-start"
                                     >
                                         <div className="text-4xl w-12 h-12 flex justify-center items-center">
-                                            {([1, 3, 5].includes(tx.amount) && '☕️') || '🔥'}
+                                            {([1, 3, 5].includes(tx.amount.toString()) && '☕️') || '🔥'}
                                         </div>
                                         <div className="w-full">
                                             <div className="flex items-center justify-between">
                                                 <div className=" text-sm text-zinc-600">
                                                     <span className="font-semibold">{tx?.name || 'Someone'}</span>{' '}
-                                                    bought <span className="font-semibold">{tx.amount}</span>{' '}
+                                                    bought <span
+                                                    className="font-semibold">{tx.amount.toString()}</span>{' '}
                                                     coffee(s)
                                                 </div>
-                                                <NewTabLink
-                                                    href={`${explorerUrl}/txid/${tx.id}`}
-                                                    className={`text-xs hover:underline cursor-pointer ${
-                                                        tx.txStatus === 'pending'
-                                                            ? 'text-orange-500'
-                                                            : 'text-zinc-600'
-                                                    }`}
-                                                >
-                                                    {tx.txStatus === 'success' ? '🚀' : '⌛'} {truncateUrl(tx.id)}
-                                                </NewTabLink>
+                                                {/*<NewTabLink*/}
+                                                {/*    href={`${explorerUrl}/txid/${tx.id}`}*/}
+                                                {/*    className={`text-xs hover:underline cursor-pointer ${*/}
+                                                {/*        tx.txStatus === 'pending'*/}
+                                                {/*            ? 'text-orange-500'*/}
+                                                {/*            : 'text-zinc-600'*/}
+                                                {/*    }`}*/}
+                                                {/*>*/}
+                                                {/*    {tx.txStatus === 'success' ? '🚀' : '⌛'} {truncateUrl(tx.id)}*/}
+                                                {/*</NewTabLink>*/}
                                             </div>
                                             <div className="text-xs mt-1 text-zinc-600">
                                                 {tx?.timestamp ? (
@@ -413,7 +383,8 @@ export default function Page() {
                                     {account ? (
                                         <PrimaryButton type="submit">Support with Ӿ{price}</PrimaryButton>
                                     ) : (
-                                        <AuthButton account={account} connectWallet={connectWallet} disconnect={disconnect}/>
+                                        <AuthButton account={account} connectWallet={connectWallet}
+                                                    disconnect={disconnect}/>
                                     )}
                                 </form>
                             </div>
