@@ -11,24 +11,18 @@ import ProfileCard from '@/components/ProfileCard';
 import {PrimaryButton} from '@/components/Button';
 import Card from '@/components/Card';
 
-import {useInterval} from '@/lib/useInterval';
-
 import {
     userSession,
-    truncateUrl,
     mapResultsFromTx,
     getNetworkConfig,
-    appDetails,
-    ONE_MILLION,
     profile,
-    authenticate, getError
+    getError
 } from '@/lib';
-import {IconWallet} from "@tabler/icons";
+
 import toast from 'react-hot-toast';
 import Web3Modal from "web3modal";
 import {providers} from "@/app/providers";
 import AuthButton from "@/components/AuthButton";
-
 import abi from "@/abis/BuyMeACoffee.json"
 
 const contractAddress = process.env.CONTRACT_ADDRESS;
@@ -156,14 +150,29 @@ export default function Page() {
         e.preventDefault();
         if (!account) return;
         try {
-            await contract.giveCoffee(message, name, amount, {
+            const result = await contract.giveCoffee(message, name, amount, {
                 // gasLimit: 21000,
                 value: ethers.utils.parseEther('0.001') * amount,
             });
+            toast.success('Thank you for the support! Your donation will be processed soon.');
+            // clear the form values
+            setMessage('');
+            setName('');
+            setAmount(3);
+
+            // console.log("SM.Result:", result);
+            // const donor = {id: Date.now(),name, message, amount,timestamp: Date.now()};
+            // setTxs(prevState => {
+            //     return [
+            //         donor,
+            //         ...prevState
+            //     ];
+            // });
+
         } catch (error) {
             const [_code, _message] = getError(error);
             toast.error(`${_code}: ${_message}`);
-            console.error("SM.Error:", _message,_code);
+            console.error("SM.Error:", _message, _code);
         }
     };
 
@@ -173,27 +182,18 @@ export default function Page() {
         const coffeeCount = Number(await contract.coffeeCount());
         if (coffeeCount > 0) {
             try {
-                let n = 6;
                 // get the last n coffees and reverse the array to get the latest coffee first
+                let n = 10;
                 const limit = coffeeCount > n ? n : coffeeCount;
                 const offset = coffeeCount > n ? coffeeCount - n : 1;
                 const donors = await contract.listCoffees(offset, limit);
-                // parse the donors and map them to a new array of objects
-                const results = donors.map((donor, index) => {
-                    return {
-                        id: Number(donor.id),
-                        name: donor.name,
-                        message: donor.message,
-                        amount: Number(donor.amount),
-                        timestamp: Number(donor.timestamp)
-                    };
-                }).reverse();
+                const results = mapResultsFromTx(donors);
                 setSupporters(coffeeCount);
                 setTxs(results);
             } catch (error) {
                 const [_code, _message] = getError(error);
                 toast.error(`${_code}: ${_message}`);
-                console.error("SM.Error:", _message,_code);
+                console.error("SM.Error:", _message, _code);
             }
         }
     };
@@ -217,33 +217,32 @@ export default function Page() {
         setSupporters(parsedValue);
     };
 
+    const subscribeToEvents = async () => {
+        contract.on('CoffeeGiven', (id, giver, timestamp, message, name, amount) => {
+            // add a new donor to donors list
+            const donor = mapResultsFromTx([{
+                id: id,
+                name: name,
+                message: message,
+                amount: amount,
+                timestamp: timestamp
+            }])[0];
+
+            setTxs(prevState => {
+                return [
+                    donor,
+                    ...prevState
+                ];
+            });
+        });
+    };
+
     // Fetching data on page load
     useEffect(() => {
         if (contract) {
             listCoffees();
+            subscribeToEvents();
         }
-
-        const subscribeToEvents = async () => {
-            if (contract) {
-                contract.on('CoffeeGiven', (id, giver, timestamp, message, name, amount) => {
-                    // add a new donor to donors list
-                    setTxs(prevState => {
-                        return [
-                            {
-                                id:id,
-                                name: name,
-                                message: message,
-                                amount: amount.toString(),
-                                timestamp: timestamp.toString()
-                            },
-                            ...prevState
-                        ];
-                    });
-                });
-            }
-        };
-
-        subscribeToEvents();
 
         return () => {
             if (contract) {
@@ -252,24 +251,6 @@ export default function Page() {
         };
 
     }, [contract]);
-
-    // // Fetching data every 60 seconds
-    // useInterval(() => {
-    //     console.log('>>>>>>>>>> getting messages');
-    //     listCoffees();
-    //     if (userSession.isUserSignedIn()) {
-    //         getSupporterCounter();
-    //     }
-    // }, 5 * 1000);
-
-
-    // export const Conditional = ({ condition, childrenTrue, childrenFalse }) => {
-    //     if (condition) {
-    //         return <>(childrenTrue)</>;
-    //     } else {
-    //         return <>(childrenFalse)</>;
-    //     }
-    // };
 
     return (
         <>
@@ -311,11 +292,11 @@ export default function Page() {
                                 </div>
                                 {txs?.map((tx) => (
                                     <div
-                                        key={tx.id.toString()}
+                                        key={"donor-" + tx.id}
                                         className="flex border-b last:border-b-0 py-4 space-x-4 items-start"
                                     >
                                         <div className="text-4xl w-12 h-12 flex justify-center items-center">
-                                            {([1, 3, 5].includes(tx.amount.toString()) && '☕️') || '🔥'}
+                                            {([1, 3, 5].includes(tx.amount) && '☕️') || '🔥'}
                                         </div>
                                         <div className="w-full">
                                             <div className="flex items-center justify-between">
@@ -325,16 +306,6 @@ export default function Page() {
                                                     className="font-semibold">{tx.amount}</span>{' '}
                                                     coffee(s)
                                                 </div>
-                                                {/*<NewTabLink*/}
-                                                {/*    href={`${explorerUrl}/txid/${tx.id}`}*/}
-                                                {/*    className={`text-xs hover:underline cursor-pointer ${*/}
-                                                {/*        tx.txStatus === 'pending'*/}
-                                                {/*            ? 'text-orange-500'*/}
-                                                {/*            : 'text-zinc-600'*/}
-                                                {/*    }`}*/}
-                                                {/*>*/}
-                                                {/*    {tx.txStatus === 'success' ? '🚀' : '⌛'} {truncateUrl(tx.id)}*/}
-                                                {/*</NewTabLink>*/}
                                             </div>
                                             <div className="text-xs mt-1 text-zinc-600">
                                                 {tx?.timestamp ? (
@@ -346,7 +317,8 @@ export default function Page() {
                                             {tx?.message && (
                                                 <div
                                                     className="border mt-4 border-blue-300 rounded w-fit bg-blue-50 px-4 py-2 text-sm text-zinc-600 flex space-x-2">
-                                                    <span className="text-lg">💬</span> <span>{tx.message.toString()}</span>
+                                                    <span className="text-lg">💬</span>
+                                                    <span>{tx.message.toString()}</span>
                                                 </div>
                                             )}
                                         </div>
