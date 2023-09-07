@@ -126,6 +126,7 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
             const coffees = await buyMeACoffee.listCoffees(1, 10);
             expect(coffees.length).to.equal(3);
             // expect coffee not to have a "giver" property
+            expect(coffees[0].id).to.equal('1');
             expect(coffees[0].giver).to.equal('0x0000000000000000000000000000000000000000');
             expect(coffees[0].message).to.equal("Test message");
             expect(coffees[0].name).to.equal("Test name");
@@ -136,6 +137,7 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
             expect(coffees[1].name).to.equal("Test name 2");
             expect(coffees[1].amount).to.equal("2");
             expect(Number(coffees[1].timestamp)).to.be.greaterThan(0);
+            expect(coffees[2].id).to.equal('3');
             expect(coffees[2].giver).to.equal('0x0000000000000000000000000000000000000000');
             expect(coffees[2].message).to.equal("Test message 3");
             expect(coffees[2].name).to.equal("Test name 3");

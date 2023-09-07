@@ -21,16 +21,17 @@ import {
     appDetails,
     ONE_MILLION,
     profile,
-    authenticate
+    authenticate, getError
 } from '@/lib';
 import {IconWallet} from "@tabler/icons";
+import toast from 'react-hot-toast';
 import Web3Modal from "web3modal";
 import {providers} from "@/app/providers";
 import AuthButton from "@/components/AuthButton";
 
 import abi from "@/abis/BuyMeACoffee.json"
 
-const contractAddress = '0x1bf383351eDb6FFE4cE48602Bc9928280E1f4401';
+const contractAddress = process.env.CONTRACT_ADDRESS;
 const contractABI = abi.abi;
 
 export default function Page() {
@@ -39,7 +40,7 @@ export default function Page() {
     const [txs, setTxs] = useState([]);
     const [supporters, setSupporters] = useState(null);
     const [name, setName] = useState('');
-    const [price, setPrice] = useState(3);
+    const [amount, setAmount] = useState(3);
     const [message, setMessage] = useState('');
 
     //#########################################################
@@ -75,8 +76,7 @@ export default function Page() {
             }
             setChainId(network.chainId);
         } catch (error) {
-            console.log('>>> error', error);
-            setError(error);
+            console.error(error);
         }
     };
 
@@ -147,35 +147,54 @@ export default function Page() {
     // const handleMessageChange = e => setMessage(emojiStrip(e.target.value));
     const handleMessageChange = e => setMessage(e.target.value);
     const handleNameChange = e => setName(e.target.value);
-    const handlePriceChange = e => setPrice(Math.floor(e.target.value));
+    const handleAmountChange = e => setAmount(Math.floor(e.target.value));
 
     // Sending a coffee donation with a message and name
     // - This method submits a transaction to the contract address with a contract call 'buy-coffee'
     // - On call success we display a toast message and add the incoming transaction to our existing list of transactions
     const handleSubmit = async e => {
         e.preventDefault();
-
         if (!account) return;
-
         try {
-            await contract.giveCoffee(message, name, price, {
-                // from: account,
-                // value: ethers.utils.parseUnits("0.11","ether")
-                value: String(0.11 * 1000000000000000000)
+            await contract.giveCoffee(message, name, amount, {
+                // gasLimit: 21000,
+                value: ethers.utils.parseEther('0.001') * amount,
             });
         } catch (error) {
-            console.error(error);
+            const [_code, _message] = getError(error);
+            toast.error(`${_code}: ${_message}`);
+            console.error("SM.Error:", _message,_code);
         }
-
     };
 
     // Fetching list of coffees
     const listCoffees = async () => {
-        const coffeeCount = await contract.coffeeCount();
+
+        const coffeeCount = Number(await contract.coffeeCount());
         if (coffeeCount > 0) {
-            const donors = await contract.listCoffees(1, 10);
-            setSupporters(coffeeCount);
-            setTxs(donors);
+            try {
+                let n = 6;
+                // get the last n coffees and reverse the array to get the latest coffee first
+                const limit = coffeeCount > n ? n : coffeeCount;
+                const offset = coffeeCount > n ? coffeeCount - n : 1;
+                const donors = await contract.listCoffees(offset, limit);
+                // parse the donors and map them to a new array of objects
+                const results = donors.map((donor, index) => {
+                    return {
+                        id: Number(donor.id),
+                        name: donor.name,
+                        message: donor.message,
+                        amount: Number(donor.amount),
+                        timestamp: Number(donor.timestamp)
+                    };
+                }).reverse();
+                setSupporters(coffeeCount);
+                setTxs(results);
+            } catch (error) {
+                const [_code, _message] = getError(error);
+                toast.error(`${_code}: ${_message}`);
+                console.error("SM.Error:", _message,_code);
+            }
         }
     };
 
@@ -206,15 +225,16 @@ export default function Page() {
 
         const subscribeToEvents = async () => {
             if (contract) {
-                contract.on('CoffeeGiven', (giver, timestamp, message, name, amount) => {
+                contract.on('CoffeeGiven', (id, giver, timestamp, message, name, amount) => {
                     // add a new donor to donors list
                     setTxs(prevState => {
                         return [
                             {
-                                timestamp: timestamp.toString(),
-                                message: message,
+                                id:id,
                                 name: name,
-                                amount: amount.toString()
+                                message: message,
+                                amount: amount.toString(),
+                                timestamp: timestamp.toString()
                             },
                             ...prevState
                         ];
@@ -289,9 +309,9 @@ export default function Page() {
                                 <div className="font-semibold text-base text-zinc-800">
                                     Recent supporters {supporters && `(${supporters})`}
                                 </div>
-                                {txs?.map((tx, index) => (
+                                {txs?.map((tx) => (
                                     <div
-                                        key={index}
+                                        key={tx.id.toString()}
                                         className="flex border-b last:border-b-0 py-4 space-x-4 items-start"
                                     >
                                         <div className="text-4xl w-12 h-12 flex justify-center items-center">
@@ -302,7 +322,7 @@ export default function Page() {
                                                 <div className=" text-sm text-zinc-600">
                                                     <span className="font-semibold">{tx?.name || 'Someone'}</span>{' '}
                                                     bought <span
-                                                    className="font-semibold">{tx.amount.toString()}</span>{' '}
+                                                    className="font-semibold">{tx.amount}</span>{' '}
                                                     coffee(s)
                                                 </div>
                                                 {/*<NewTabLink*/}
@@ -326,7 +346,7 @@ export default function Page() {
                                             {tx?.message && (
                                                 <div
                                                     className="border mt-4 border-blue-300 rounded w-fit bg-blue-50 px-4 py-2 text-sm text-zinc-600 flex space-x-2">
-                                                    <span className="text-lg">💬</span> <span>{tx.message}</span>
+                                                    <span className="text-lg">💬</span> <span>{tx.message.toString()}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -358,12 +378,12 @@ export default function Page() {
                                         <div className="text-4xl">☕️</div>
                                         <div className="text-xl text-orange-500 font-bold">x</div>
 
-                                        <SelectItem setPrice={setPrice} price={price} currentValue={1}/>
-                                        <SelectItem setPrice={setPrice} price={price} currentValue={3}/>
-                                        <SelectItem setPrice={setPrice} price={price} currentValue={5}/>
+                                        <SelectItem setPrice={setAmount} price={amount} currentValue={1}/>
+                                        <SelectItem setPrice={setAmount} price={amount} currentValue={3}/>
+                                        <SelectItem setPrice={setAmount} price={amount} currentValue={5}/>
 
                                         <div className="w-10">
-                                            <Input type="number" value={price} onChange={handlePriceChange}/>
+                                            <Input type="number" value={amount} onChange={handleAmountChange}/>
                                         </div>
                                     </div>
 
@@ -381,7 +401,7 @@ export default function Page() {
                                         label="Message"
                                     />
                                     {account ? (
-                                        <PrimaryButton type="submit">Support with Ӿ{price}</PrimaryButton>
+                                        <PrimaryButton type="submit">Support with Ӿ{amount}</PrimaryButton>
                                     ) : (
                                         <AuthButton account={account} connectWallet={connectWallet}
                                                     disconnect={disconnect}/>

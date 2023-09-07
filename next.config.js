@@ -8,6 +8,9 @@ const nextConfig = {
             'bufferutil': 'commonjs bufferutil',
         })
         return config
+    },
+    env: {
+        CONTRACT_ADDRESS: process.env.CONTRACT_ADDRESS
     }
 }
 
