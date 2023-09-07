@@ -12,7 +12,6 @@ contract BuyMeACoffee {
     address payable public owner;
     // Define a variable to track the number of coffees given
     uint256 public coffeeCount = 0;
-
     // Define a mapping of `uint256` to `Coffee` structs
     mapping(uint256 => Coffee) coffees;
 
@@ -86,7 +85,8 @@ contract BuyMeACoffee {
         require(index <= coffeeCount, "##The index should be less than or equal to the coffee count");
         // Make sure the limit + index is less than or equal to the coffee count
         if (limit + index > coffeeCount) {
-            limit = coffeeCount - index + 1;
+//            limit = coffeeCount - index + 1;
+            limit = coffeeCount ;
         }
 
         // Create a new array of Coffee structs

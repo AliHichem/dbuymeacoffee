@@ -179,16 +179,16 @@ export default function Page() {
     // Fetching list of coffees
     const listCoffees = async () => {
 
-        const coffeeCount = Number(await contract.coffeeCount());
-        if (coffeeCount > 0) {
+        const c = Number(await contract.coffeeCount());
+        if (c > 0) {
             try {
                 // get the last n coffees and reverse the array to get the latest coffee first
-                let n = 10;
-                const limit = coffeeCount > n ? n : coffeeCount;
-                const offset = coffeeCount > n ? coffeeCount - n : 1;
+                let n = 5;
+                const limit = n;
+                const offset = c > n ? c - n +1 : 1;
                 const donors = await contract.listCoffees(offset, limit);
                 const results = mapResultsFromTx(donors);
-                setSupporters(coffeeCount);
+                setSupporters(c);
                 setTxs(results);
             } catch (error) {
                 const [_code, _message] = getError(error);
@@ -196,25 +196,6 @@ export default function Page() {
                 console.error("SM.Error:", _message, _code);
             }
         }
-    };
-
-    // Fetching number of supporters
-    // - This method fetches the number of supporters from the contract address.
-    // - We parse the response to get the number of supporters.
-    const getSupporterCounter = async () => {
-        const userAddress = userSession.loadUserData().profile.stxAddress.testnet;
-
-        const counter = await callReadOnlyFunction({
-            contractAddress,
-            contractName: 'coffee',
-            functionName: 'get-index',
-            network,
-            functionArgs: [],
-            senderAddress: userAddress
-        });
-
-        const parsedValue = parseInt(counter?.value?.value);
-        setSupporters(parsedValue);
     };
 
     const subscribeToEvents = async () => {

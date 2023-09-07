@@ -106,23 +106,31 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
             expect(err.message.includes(message));
         });
 
+        const giveRandomCoffee = (message, name, amount, giver) => {
+            // set default random giver between firstGiver and secondGiver
+            if (typeof giver === 'undefined') giver = Math.random() >= 0.5 ? firstGiver : secondGiver;
+            // set default random message
+            if (typeof message === 'undefined') message = "Test message";
+            // set default random amount from 1 to 5
+            if (typeof amount === 'undefined') amount = Math.floor(Math.random() * 5) + 1;
+            // set default random name
+            if (typeof name === 'undefined') name = "Test name";
+
+            return buyMeACoffee.giveCoffee(message, name, amount, {
+                from: giver,
+                value: web3.utils.toWei('0.01', 'Ether') * amount
+            });
+        };
+
         it("should return an array of Coffee struct listing the name, message, amount and timestamp", async function () {
 
             // renew the contract
             buyMeACoffee = await BuyMeACoffee.new({from: deployer})
 
-            await buyMeACoffee.giveCoffee("Test message", "Test name", 1, {
-                from: firstGiver,
-                value: web3.utils.toWei('0.01', 'Ether')
-            });
-            await buyMeACoffee.giveCoffee("Test message 2", "Test name 2", 2, {
-                from: secondGiver,
-                value: web3.utils.toWei('0.02', 'Ether')
-            });
-            await buyMeACoffee.giveCoffee("Test message 3", "Test name 3", 3, {
-                from: firstGiver,
-                value: web3.utils.toWei('0.03', 'Ether')
-            });
+            await giveRandomCoffee("Test message", "Test name", 1, firstGiver);
+            await giveRandomCoffee("Test message 2", "Test name 2", 2, secondGiver);
+            await giveRandomCoffee("Test message 3", "Test name 3", 3, firstGiver);
+
             const coffees = await buyMeACoffee.listCoffees(1, 10);
             expect(coffees.length).to.equal(3);
             // expect coffee not to have a "giver" property
@@ -145,5 +153,54 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
             expect(Number(coffees[2].timestamp)).to.be.greaterThan(0);
         });
 
+        it("should return an array of Coffee struct that matches the given offset and limit", async function () {
+
+            // renew the contract
+            buyMeACoffee = await BuyMeACoffee.new({from: deployer})
+
+            // create 13 random coffees
+            for (let i = 0; i < 13; i++) {
+                await giveRandomCoffee();
+            }
+            const count = await buyMeACoffee.coffeeCount();
+            expect(count.toString()).to.equal('13');
+
+            // get the last 6 coffees
+            const coffees0 = await buyMeACoffee.listCoffees(8, 6);
+            expect(coffees0.length).to.equal(6);
+            expect(coffees0[0].id).to.equal('8');
+            expect(coffees0[1].id).to.equal('9');
+            expect(coffees0[2].id).to.equal('10');
+            expect(coffees0[3].id).to.equal('11');
+            expect(coffees0[4].id).to.equal('12');
+            expect(coffees0[5].id).to.equal('13');
+
+            // get the last 8 coffees
+            const coffees = await buyMeACoffee.listCoffees(6, 8);
+            expect(coffees.length).to.equal(8);
+            expect(coffees[0].id).to.equal('6');
+            expect(coffees[1].id).to.equal('7');
+            expect(coffees[2].id).to.equal('8');
+            expect(coffees[3].id).to.equal('9');
+            expect(coffees[4].id).to.equal('10');
+            expect(coffees[5].id).to.equal('11');
+            expect(coffees[6].id).to.equal('12');
+            expect(coffees[7].id).to.equal('13');
+
+            // get the last 10 coffees
+            const coffees2 = await buyMeACoffee.listCoffees(4, 10);
+            expect(coffees2.length).to.equal(10);
+            expect(coffees2[0].id).to.equal('4');
+            expect(coffees2[1].id).to.equal('5');
+            expect(coffees2[2].id).to.equal('6');
+            expect(coffees2[3].id).to.equal('7');
+            expect(coffees2[4].id).to.equal('8');
+            expect(coffees2[5].id).to.equal('9');
+            expect(coffees2[6].id).to.equal('10');
+            expect(coffees2[7].id).to.equal('11');
+            expect(coffees2[8].id).to.equal('12');
+            expect(coffees2[9].id).to.equal('13');
+
+        });
     });
 });
