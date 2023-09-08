@@ -30,6 +30,7 @@ const contractABI = abi.abi;
 
 export default function Page() {
 
+    const [mounted, setMounted] = useState(false);
     const [txs, setTxs] = useState([]);
     const [supporters, setSupporters] = useState(null);
     const [name, setName] = useState('');
@@ -40,13 +41,16 @@ export default function Page() {
     //############## handle wallet connect ####################
     //#########################################################
 
-    let [account, setAccount] = useState(null);
     const [provider, setProvider] = useState(null);
-    const [contract, setContract] = useState(null);
     const [library, setLibrary] = useState();
-    const [network, setNetwork] = useState();
-    const [chainId, setChainId] = useState();
+    let [account, setAccount] = useState(null);
     const [error, setError] = useState("");
+    const [chainId, setChainId] = useState();
+    const [network, setNetwork] = useState();
+    const [verified, setVerified] = useState();
+    const [ethereum, setEthereum] = useState(undefined);
+    const [contract, setContract] = useState(null);
+    const [events, setEvents] = useState([]);
 
     const connectWallet = async () => {
         try {
@@ -74,6 +78,7 @@ export default function Page() {
         setAccount();
         setChainId();
         setNetwork("");
+        setVerified(undefined);
         sessionStorage.removeItem('account');
     };
 
@@ -81,6 +86,8 @@ export default function Page() {
         await web3Modal.clearCachedProvider();
         refreshState();
     };
+    
+    useEffect(() => setMounted(true), []);
 
     useEffect(() => {
         (async () => {
@@ -130,6 +137,7 @@ export default function Page() {
     //#########################################################
     //############## handle coffees donations #################
     //#########################################################
+
 
     // const handleMessageChange = e => setMessage(emojiStrip(e.target.value));
     const handleMessageChange = e => setMessage(e.target.value);
@@ -224,11 +232,11 @@ export default function Page() {
                         <div>Hey there !</div>
                     </div>
                     <div className="mt-2 text-sm text-zinc-700 max-w-2xl">
-                        This is a demo app on how to build an simple dapp with Solidity smart contracts
-                        and Web3.js. Feel free grab some testnet STX from the {''}
+                        This is a demo app on how to build an simple dapp with Solidity, Next.js
+                        and Ether.js. Feel free grab some testnet ETH from the {''}
                         <span className="text-orange-500 font-semibold hover:underline cursor-pointer">
-          <NewTabLink href="https://explorer.stacks.co/sandbox/deploy?chain=testnet">
-            Faucet
+          <NewTabLink href="https://sepoliafaucet.com/">
+            SepoliaFaucet
           </NewTabLink>
         </span>{' '} to try out the app. Contracts are deployed on{' '}
                         <span className="text-orange-500 font-semibold hover:underline cursor-pointer">
@@ -297,7 +305,7 @@ export default function Page() {
                                 <div className="flex justify-between">
                                     <div className="font-semibold text-lg mb-4 text-left">
                                         Buy <span className="font-bold text-orange-500">Me</span> a coffee
-                                        with Ӿ
+                                        with Ξ
                                     </div>
 
                                     <div>
@@ -336,7 +344,7 @@ export default function Page() {
                                         label="Message"
                                     />
                                     {account ? (
-                                        <PrimaryButton type="submit">Support with Ӿ{amount}</PrimaryButton>
+                                        <PrimaryButton type="submit">Support with {amount}Ξ</PrimaryButton>
                                     ) : (
                                         <AuthButton account={account} connectWallet={connectWallet}
                                                     disconnect={disconnect}/>

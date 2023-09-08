@@ -13,7 +13,7 @@ export default function AppNavbar({account, connectWallet, disconnect}) {
                             <div className="text-l font-bold ">Buy me a coffee</div>
                             <div
                                 className="ml-2 block rounded-full bg-gray-700 px-2 py-0.5 text-xs font-semibold text-white ">
-                                with stacks
+                                with Ethers
                             </div>
                         </div>
                     </Link>
