@@ -1,4 +1,3 @@
-import {ONE_MILLION} from './constant';
 
 export const truncateUrl = (url: string) => {
     if (url.length > 6) {

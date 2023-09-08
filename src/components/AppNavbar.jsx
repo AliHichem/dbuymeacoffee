@@ -1,5 +1,4 @@
 import Container from './Container';
-// import {authenticate, userSession} from '@/lib';
 import Link from 'next/link';
 import AuthButton from './AuthButton';
 

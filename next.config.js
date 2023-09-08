@@ -10,7 +10,10 @@ const nextConfig = {
         return config
     },
     env: {
-        CONTRACT_ADDRESS: process.env.CONTRACT_ADDRESS
+        CONTRACT_ADDRESS: process.env.CONTRACT_ADDRESS,
+        NEXT_PUBLIC_NETWORK: process.env.NEXT_PUBLIC_NETWORK,
+        ETHER_UNIT: process.env.ETHER_UNIT,
+        COFFEES_LISTING_LIMIT: process.env.COFFEES_LISTING_LIMIT
     }
 }
 

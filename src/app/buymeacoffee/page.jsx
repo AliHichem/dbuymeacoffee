@@ -12,9 +12,7 @@ import {PrimaryButton} from '@/components/Button';
 import Card from '@/components/Card';
 
 import {
-    userSession,
     mapResultsFromTx,
-    getNetworkConfig,
     profile,
     getError
 } from '@/lib';
@@ -25,12 +23,13 @@ import {providers} from "@/app/providers";
 import AuthButton from "@/components/AuthButton";
 import abi from "@/abis/BuyMeACoffee.json"
 
+const coffeesLimit = process.env.COFFEES_LISTING_LIMIT;
+const etherUnit = process.env.ETHER_UNIT;
 const contractAddress = process.env.CONTRACT_ADDRESS;
 const contractABI = abi.abi;
 
 export default function Page() {
 
-    const [mounted, setMounted] = useState(false);
     const [txs, setTxs] = useState([]);
     const [supporters, setSupporters] = useState(null);
     const [name, setName] = useState('');
@@ -41,16 +40,13 @@ export default function Page() {
     //############## handle wallet connect ####################
     //#########################################################
 
-    const [provider, setProvider] = useState(null);
-    const [library, setLibrary] = useState();
     let [account, setAccount] = useState(null);
-    const [error, setError] = useState("");
-    const [chainId, setChainId] = useState();
-    const [network, setNetwork] = useState();
-    const [verified, setVerified] = useState();
-    const [ethereum, setEthereum] = useState(undefined);
+    const [provider, setProvider] = useState(null);
     const [contract, setContract] = useState(null);
-    const [events, setEvents] = useState([]);
+    const [library, setLibrary] = useState();
+    const [network, setNetwork] = useState();
+    const [chainId, setChainId] = useState();
+    const [error, setError] = useState("");
 
     const connectWallet = async () => {
         try {
@@ -78,7 +74,6 @@ export default function Page() {
         setAccount();
         setChainId();
         setNetwork("");
-        setVerified(undefined);
         sessionStorage.removeItem('account');
     };
 
@@ -98,17 +93,17 @@ export default function Page() {
     useEffect(() => {
         if (provider?.on) {
             const handleAccountsChanged = (accounts) => {
-                console.log("accountsChanged", accounts);
+                console.info("accountsChanged", accounts);
                 if (accounts) setAccount(accounts[0]);
             };
 
             const handleChainChanged = (_hexChainId) => {
-                console.log("chainChanged", _hexChainId);
+                console.info("chainChanged", _hexChainId);
                 setChainId(_hexChainId);
             };
 
             const handleDisconnect = () => {
-                console.log("disconnect", error);
+                console.info("disconnect", error);
                 disconnect();
             };
 
@@ -136,8 +131,6 @@ export default function Page() {
     //############## handle coffees donations #################
     //#########################################################
 
-    useEffect(() => setMounted(true), []);
-
     // const handleMessageChange = e => setMessage(emojiStrip(e.target.value));
     const handleMessageChange = e => setMessage(e.target.value);
     const handleNameChange = e => setName(e.target.value);
@@ -152,23 +145,13 @@ export default function Page() {
         try {
             const result = await contract.giveCoffee(message, name, amount, {
                 // gasLimit: 21000,
-                value: ethers.utils.parseEther('0.001') * amount,
+                value: ethers.utils.parseEther(etherUnit) * amount,
             });
             toast.success('Thank you for the support! Your donation will be processed soon.');
             // clear the form values
             setMessage('');
             setName('');
             setAmount(3);
-
-            // console.log("SM.Result:", result);
-            // const donor = {id: Date.now(),name, message, amount,timestamp: Date.now()};
-            // setTxs(prevState => {
-            //     return [
-            //         donor,
-            //         ...prevState
-            //     ];
-            // });
-
         } catch (error) {
             const [_code, _message] = getError(error);
             toast.error(`${_code}: ${_message}`);
@@ -183,9 +166,8 @@ export default function Page() {
         if (c > 0) {
             try {
                 // get the last n coffees and reverse the array to get the latest coffee first
-                let n = 5;
-                const limit = n;
-                const offset = c > n ? c - n +1 : 1;
+                let limit = coffeesLimit;
+                const offset = c > limit ? c - limit + 1 : 1;
                 const donors = await contract.listCoffees(offset, limit);
                 const results = mapResultsFromTx(donors);
                 setSupporters(c);
@@ -321,7 +303,7 @@ export default function Page() {
                                     <div>
                                         <div
                                             className="ml-2 rounded-xl capitalize inline-flex border px-2 py-0.5 text-xs font-semibold text-zinc-500">
-                                            {process.env.NEXT_PUBLIC_NETWORK || 'devnet'}
+                                            {network || 'devnet'}
                                         </div>
                                     </div>
                                 </div>

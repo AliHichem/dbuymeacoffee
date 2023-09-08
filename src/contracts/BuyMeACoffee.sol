@@ -85,7 +85,6 @@ contract BuyMeACoffee {
         require(index <= coffeeCount, "##The index should be less than or equal to the coffee count");
         // Make sure the limit + index is less than or equal to the coffee count
         if (limit + index > coffeeCount) {
-//            limit = coffeeCount - index + 1;
             limit = coffeeCount ;
         }
 
