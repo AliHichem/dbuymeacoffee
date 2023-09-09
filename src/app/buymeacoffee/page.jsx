@@ -21,10 +21,13 @@ import {
     IconLoader2,
 } from '@tabler/icons';
 
+import {motion} from "framer-motion"
 import toast from 'react-hot-toast';
+import ConfirmToast from '@/components/ConfirmToast';
 import Web3Modal from "web3modal";
 import {providers} from "@/app/providers";
 import AuthButton from "@/components/AuthButton";
+import WithdrawButton from "@/components/WithdrawButton";
 import abi from "@/abis/BuyMeACoffee.json"
 
 const coffeesLimit = process.env.COFFEES_LISTING_LIMIT;
@@ -46,13 +49,16 @@ export default function Page() {
     //############## handle wallet connect ####################
     //#########################################################
 
+    let [account, setAccount] = useState(null);
     const [provider, setProvider] = useState(null);
     const [library, setLibrary] = useState();
-    let [account, setAccount] = useState(null);
     const [error, setError] = useState("");
     const [chainId, setChainId] = useState();
     const [network, setNetwork] = useState();
     const [contract, setContract] = useState(null);
+    const [owner, setOwner] = useState();
+    const [rawBalance, setRawBalance] = useState();
+    const [balance, setBalance] = useState();
 
     const connectWallet = async () => {
         try {
@@ -63,6 +69,8 @@ export default function Page() {
             const network = await library.getNetwork();
             const signer = library.getSigner();
             const contract = new ethers.Contract(contractAddress, contractABI, signer);
+            const owner = await contract.owner();
+            setOwner(owner);
             setContract(contract);
             setProvider(provider);
             setLibrary(library);
@@ -146,13 +154,24 @@ export default function Page() {
     const handleNameChange = e => setName(e.target.value);
     const handleAmountChange = e => setAmount(Math.floor(e.target.value));
 
-    // const giveCoffee = usePromise(async (message,name,amount) => {
-    //     return await contract.giveCoffee(message, name, amount, {
-    //         // gasLimit: 21000,
-    //         value: ethers.utils.parseEther(etherUnit) * amount,
-    //     });
-    // });
-
+    const refreshBalance = async () => {
+        const rawBalance = await contract.getBalance();
+        const balance = ethers.utils.formatEther(rawBalance);
+        setRawBalance(rawBalance);
+        setBalance(balance);
+    };
+    const withdraw = async () => {
+        if (!account) return;
+        if (!(account === owner)) return;
+        try {
+            await contract.withdrawAll();
+            toast.success('Withdraw success');
+        } catch (error) {
+            const [_code, _message] = getError(error);
+            toast.error(`${_code}: ${_message}`);
+            console.error("SM.Error:", _message, _code);
+        }
+    };
 
     // Sending a coffee donation with a message and name
     // - This method submits a transaction to the contract address with a contract call 'buy-coffee'
@@ -162,6 +181,7 @@ export default function Page() {
         if (!account) return;
         setLoading(true);
         try {
+        console.log(message, name, amount, ethers.utils.parseEther(etherUnit) * amount);
             await contract.giveCoffee(message, name, amount, {
                 // gasLimit: 21000,
                 value: ethers.utils.parseEther(etherUnit) * amount,
@@ -217,6 +237,12 @@ export default function Page() {
                     ...prevState
                 ];
             });
+
+            refreshBalance();
+        });
+
+        contract.on('Withdrawn', (owner, to, amount) => {
+            refreshBalance();
         });
     };
 
@@ -225,6 +251,7 @@ export default function Page() {
         if (contract) {
             listCoffees();
             subscribeToEvents();
+            refreshBalance();
         }
 
         return () => {
@@ -236,7 +263,11 @@ export default function Page() {
     }, [contract]);
 
     return (
-        <>
+        <motion.div
+            initial={{opacity: 0, scale: 1}}
+            animate={{opacity: 1, scale: 1}}
+            transition={{duration: 0.5}}
+        >
             <AppNavbar account={account} connectWallet={connectWallet} disconnect={disconnect}/>
             <Container>
                 <div className="mx-auto mt-8">
@@ -253,8 +284,8 @@ export default function Page() {
         </span>{' '} to try out the app. Contracts are deployed on{' '}
                         <span className="text-orange-500 font-semibold hover:underline cursor-pointer">
           <NewTabLink
-              href="https://explorer.stacks.co/txid/ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.coffee?chain=testnet">
-            Testnet
+              href="https://sepoliafaucet.com/">
+            Sepolia
           </NewTabLink>
         </span>
                         . You can find a source code on{' '}
@@ -265,6 +296,32 @@ export default function Page() {
         </span>
                     </div>
                 </div>
+                {(account == owner) ? (<div className="mx-auto mt-8">
+                    <div className="mt-4 sm:mt-0">
+                        <Card>
+                            <div className="p-4 items-center text-center mx-auto w-full">
+                                <div className="flex justify-between">
+                                    <div className="font-semibold text-base text-zinc-900">
+                                        Current Balance: <span
+                                        className="font-bold text-orange-500">${balance} Ξ </span>
+                                    </div>
+
+                                    <div>
+                                        <ConfirmToast
+                                            asModal={true}
+                                            childrenClassName='margin-top-1'
+                                            customFunction={withdraw}
+                                            message='Withdraw all your funds ?'
+                                            showCloseIcon={false}
+                                            theme='light'>
+                                            <WithdrawButton/>
+                                        </ConfirmToast>
+                                    </div>
+                                </div>
+                            </div>
+                        </Card>
+                    </div>
+                </div>) : (<></>)}
                 <div className="md:flex gap-4 justify-center pt-8 max-w mb-16">
                     <div className="flex flex-col gap-4">
                         <ProfileCard profile={profile}/>
@@ -375,7 +432,7 @@ export default function Page() {
                     </div>
                 </div>
             </Container>
-        </>
+        </motion.div>
     );
 }
 

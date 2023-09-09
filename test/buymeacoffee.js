@@ -11,6 +11,22 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
 
     let buyMeACoffee;
 
+    const giveRandomCoffee = (message, name, amount, giver) => {
+        // set default random giver between firstGiver and secondGiver
+        if (typeof giver === 'undefined') giver = Math.random() >= 0.5 ? firstGiver : secondGiver;
+        // set default random message
+        if (typeof message === 'undefined') message = "Test message";
+        // set default random amount from 1 to 5
+        if (typeof amount === 'undefined') amount = Math.floor(Math.random() * 5) + 1;
+        // set default random name
+        if (typeof name === 'undefined') name = "Test name";
+
+        return buyMeACoffee.giveCoffee(message, name, amount, {
+            from: giver,
+            value: web3.utils.toWei('0.01', 'Ether') * amount
+        });
+    };
+
     before(async () => {
         buyMeACoffee = await BuyMeACoffee.new({from: deployer})
         const contractAddress = buyMeACoffee.address;
@@ -42,10 +58,7 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
     describe('givers', async () => {
 
         it('should increment the coffee count correctly', async () => {
-            await buyMeACoffee.giveCoffee('Test message', 'Test name', 1, {
-                from: firstGiver,
-                value: web3.utils.toWei('0.01', 'Ether')
-            });
+            await giveRandomCoffee("Test message", "Test name", 1, firstGiver);
             const coffeeCount = await buyMeACoffee.coffeeCount();
             assert.equal(coffeeCount, 1);
         });
@@ -55,10 +68,7 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
             // reset the balance
             await buyMeACoffee.withdrawAll({from: owner});
             const oldBalance = Number(await web3.eth.getBalance(owner) / 10 ** 18);
-            await buyMeACoffee.giveCoffee('Test message', 'Test name', 1, {
-                from: firstGiver,
-                value: web3.utils.toWei('0.01', 'Ether')
-            });
+            await giveRandomCoffee("Test message", "Test name", 1, firstGiver);
             await buyMeACoffee.withdrawAll({from: owner});
             const newBalance = Number(await web3.eth.getBalance(owner) / 10 ** 18);
             expect(newBalance).to.be.greaterThan(0);
@@ -66,10 +76,7 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
         });
 
         it('should emit the event correctly', async () => {
-            await buyMeACoffee.giveCoffee('Test message', 'Test name', 1, {
-                from: firstGiver,
-                value: web3.utils.toWei('0.01', 'Ether')
-            });
+            await giveRandomCoffee("Test message", "Test name", 1, firstGiver);
             const events = await buyMeACoffee.getPastEvents('CoffeeGiven');
             expect(events.length).to.equal(1);
         });
@@ -98,29 +105,10 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
 
         it("should not allow if the index is lte to the coffee count", async function () {
             let message = "The index should be less than or equal to the coffee count";
-            await buyMeACoffee.giveCoffee("Test message", "Test name", 10, {
-                from: firstGiver,
-                value: web3.utils.toWei('0.01', 'Ether')
-            });
+            await giveRandomCoffee("Test message", "Test name", 10, firstGiver);
             let err = await utils.shouldThrow(buyMeACoffee.listCoffees(11, 1));
             expect(err.message.includes(message));
         });
-
-        const giveRandomCoffee = (message, name, amount, giver) => {
-            // set default random giver between firstGiver and secondGiver
-            if (typeof giver === 'undefined') giver = Math.random() >= 0.5 ? firstGiver : secondGiver;
-            // set default random message
-            if (typeof message === 'undefined') message = "Test message";
-            // set default random amount from 1 to 5
-            if (typeof amount === 'undefined') amount = Math.floor(Math.random() * 5) + 1;
-            // set default random name
-            if (typeof name === 'undefined') name = "Test name";
-
-            return buyMeACoffee.giveCoffee(message, name, amount, {
-                from: giver,
-                value: web3.utils.toWei('0.01', 'Ether') * amount
-            });
-        };
 
         it("should return an array of Coffee struct listing the name, message, amount and timestamp", async function () {
 
@@ -202,5 +190,42 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
             expect(coffees2[9].id).to.equal('13');
 
         });
+    });
+
+    describe('withdraw', async () => {
+
+        it('should not allow non-owner to withdraw', async () => {
+            const owner = await buyMeACoffee.owner();
+            const nonOwner = firstGiver;
+            assert.notEqual(owner, nonOwner);
+            let message = "Only the owner can withdraw funds";
+            let err = await utils.shouldThrow(buyMeACoffee.withdrawAll({from: nonOwner}));
+            expect(err.message.includes(message));
+        });
+
+        it('should allow owner to withdraw', async () => {
+            const owner = await buyMeACoffee.owner();
+            const oldBalance = Number(await web3.eth.getBalance(owner) / 10 ** 18);
+            await buyMeACoffee.withdrawAll({from: owner});
+            const newBalance = Number(await web3.eth.getBalance(owner) / 10 ** 18);
+            expect(newBalance).to.be.greaterThan(0);
+            expect(newBalance).to.be.greaterThan(oldBalance);
+        });
+
+        // it('should reset the balance to zero after withdrawal', async () => {
+        //     const owner = await buyMeACoffee.owner();
+        //     const oldBalance = Number(await web3.eth.getBalance(owner) / 10 ** 18);
+        //     await buyMeACoffee.withdrawAll({from: owner});
+        //     const newBalance = Number(await web3.eth.getBalance(owner) / 10 ** 18);
+        //     expect(newBalance).to.equal(0);
+        // });
+
+        it('should emit the event correctly', async () => {
+            const owner = await buyMeACoffee.owner();
+            const tx = await buyMeACoffee.withdrawAll({from: owner});
+            const events = await buyMeACoffee.getPastEvents('Withdrawn');
+            expect(events.length).to.equal(1);
+        });
+
     });
 });

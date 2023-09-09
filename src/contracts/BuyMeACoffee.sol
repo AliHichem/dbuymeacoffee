@@ -35,6 +35,13 @@ contract BuyMeACoffee {
         uint256 amount
     );
 
+    //Define an event that will be emitted when a coffee is withdrawn
+    event Withdrawn(
+        address indexed from,
+        address indexed to,
+        uint256 amount
+    );
+
     constructor() {
         name = "Buy Me A Coffee";
         owner = payable(msg.sender);
@@ -56,10 +63,6 @@ contract BuyMeACoffee {
         coffeeCount ++;
         // Create the coffee
         coffees[coffeeCount] = Coffee(coffeeCount, msg.sender, block.timestamp, _message, _name, _amount);
-        //// Save the money in the contract (no code needed here)
-        //(bool success,) = owner.call{value: msg.value}("");
-        //require(success, "Failed to send money");
-
         // Trigger the event
         emit CoffeeGiven(coffeeCount, msg.sender, block.timestamp, _message, _name, _amount);
     }
@@ -67,10 +70,11 @@ contract BuyMeACoffee {
     // Define a function 'withdrawAll' that allows the owner to withdraw all the Ether in the contract
     function withdrawAll() external payable {
         // Make sure the sender is the owner
-        require(msg.sender == owner, "##The sender should be the owner");
+        require(msg.sender == owner, "##Only the owner can withdraw funds");
         // Send all the Ether in the contract to the owner
-        (bool success,) = owner.call{value: address(this).balance}("");
-        require(success, "##Failed to withdraw the money");
+        owner.transfer(address(this).balance);
+        // Emit the Withdrawal event
+        emit Withdrawn(msg.sender, owner, address(this).balance);
     }
 
     // list Coffee from coffees mapping by index and limit
