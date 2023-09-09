@@ -17,6 +17,10 @@ import {
     getError
 } from '@/lib';
 
+import {
+    IconLoader2,
+} from '@tabler/icons';
+
 import toast from 'react-hot-toast';
 import Web3Modal from "web3modal";
 import {providers} from "@/app/providers";
@@ -36,6 +40,7 @@ export default function Page() {
     const [name, setName] = useState('');
     const [amount, setAmount] = useState(3);
     const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
     //#########################################################
     //############## handle wallet connect ####################
@@ -47,10 +52,7 @@ export default function Page() {
     const [error, setError] = useState("");
     const [chainId, setChainId] = useState();
     const [network, setNetwork] = useState();
-    const [verified, setVerified] = useState();
-    const [ethereum, setEthereum] = useState(undefined);
     const [contract, setContract] = useState(null);
-    const [events, setEvents] = useState([]);
 
     const connectWallet = async () => {
         try {
@@ -86,7 +88,7 @@ export default function Page() {
         await web3Modal.clearCachedProvider();
         refreshState();
     };
-    
+
     useEffect(() => setMounted(true), []);
 
     useEffect(() => {
@@ -144,17 +146,26 @@ export default function Page() {
     const handleNameChange = e => setName(e.target.value);
     const handleAmountChange = e => setAmount(Math.floor(e.target.value));
 
+    // const giveCoffee = usePromise(async (message,name,amount) => {
+    //     return await contract.giveCoffee(message, name, amount, {
+    //         // gasLimit: 21000,
+    //         value: ethers.utils.parseEther(etherUnit) * amount,
+    //     });
+    // });
+
+
     // Sending a coffee donation with a message and name
     // - This method submits a transaction to the contract address with a contract call 'buy-coffee'
     // - On call success we display a toast message and add the incoming transaction to our existing list of transactions
     const handleSubmit = async e => {
         e.preventDefault();
         if (!account) return;
+        setLoading(true);
         try {
-            const result = await contract.giveCoffee(message, name, amount, {
+            await contract.giveCoffee(message, name, amount, {
                 // gasLimit: 21000,
                 value: ethers.utils.parseEther(etherUnit) * amount,
-            });
+            })
             toast.success('Thank you for the support! Your donation will be processed soon.');
             // clear the form values
             setMessage('');
@@ -165,6 +176,7 @@ export default function Page() {
             toast.error(`${_code}: ${_message}`);
             console.error("SM.Error:", _message, _code);
         }
+        setLoading(false);
     };
 
     // Fetching list of coffees
@@ -326,17 +338,20 @@ export default function Page() {
                                         <SelectItem setPrice={setAmount} price={amount} currentValue={5}/>
 
                                         <div className="w-10">
-                                            <Input type="number" value={amount} onChange={handleAmountChange}/>
+                                            <Input disabled={loading} type="number" value={amount}
+                                                   onChange={handleAmountChange}/>
                                         </div>
                                     </div>
 
                                     <Input
+                                        disabled={loading}
                                         value={name}
                                         onChange={handleNameChange}
                                         placeholder="Name or @twitter (optional)"
                                         label="Name"
                                     />
                                     <TextArea
+                                        disabled={loading}
                                         value={message}
                                         rows={6}
                                         onChange={handleMessageChange}
@@ -344,7 +359,12 @@ export default function Page() {
                                         label="Message"
                                     />
                                     {account ? (
-                                        <PrimaryButton type="submit">Support with {amount}Ξ</PrimaryButton>
+                                        <>
+                                            <PrimaryButton disabled={loading} type="submit">Support
+                                                with {amount}Ξ</PrimaryButton>
+                                            {loading ? (<IconLoader2
+                                                className="animate-spin inline-flex items-center px-1 py-1 text-xs space-x-2 font-medium transition rounded font-medium relative"/>) : (<></>)}
+                                        </>
                                     ) : (
                                         <AuthButton account={account} connectWallet={connectWallet}
                                                     disconnect={disconnect}/>
