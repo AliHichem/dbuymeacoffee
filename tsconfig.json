@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "ES2018",
+      "dom"
+    ],
+    "module": "CommonJS",
+    "target": "ES2018",
+    "strict": true,
+    "esModuleInterop": true,
+    "types": [
+      "@types/node",
+      "@types/chai",
+      "@types/mocha"
+    ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "baseUrl": "."
+  },
+  "include": [
+    "**/*.ts",
+    ".next/types/**/*.ts",
+    "next-env.d.ts",
+    "**/*.tsx",
+    "**/*.jsx",
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "cache",
+    "artifacts"
+  ]
+}

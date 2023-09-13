@@ -1,13 +1,22 @@
+export interface TransactionResult {
+    id: string;
+    name: string;
+    message: string;
+    amount: string;
+    timestamp: string;
+}
 
-export const truncateUrl = (url: string) => {
-    if (url.length > 6) {
-        return url.slice(0, 4) + '...' + url.slice(-3);
-    }
-    return url;
-};
+// donor interface
+export interface Donor {
+    id: number;
+    name: string;
+    message: string;
+    amount: number;
+    timestamp: number;
+}
 
-export const mapResultsFromTx = results =>
-    results
+export const mapResultsFromTx = (results: TransactionResult[]): Donor[] => {
+    return results
         // .filter(
         //     tx =>
         //         tx.tx_type === 'contract_call' && tx.contract_call.function_name === 'buy-coffee'
@@ -21,9 +30,9 @@ export const mapResultsFromTx = results =>
                 timestamp: Number(donor.timestamp)
             };
         }).reverse();
+}
 
-
-export const getError = (error: any) => {
+export const getError = (error: any): [number, string] => {
     const _code = error?.data?.code;
     const _error = error?.data?.message;
     // keep all string after the first "##"
