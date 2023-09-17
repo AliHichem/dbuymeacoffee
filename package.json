@@ -7,6 +7,7 @@
     "@coinbase/wallet-sdk": "3.0.1",
     "@headlessui/react": "^1.7.3",
     "@openzeppelin/contracts": "^4.9.3",
+    "@openzeppelin/contracts-upgradeable": "^4.9.3",
     "@stacks/connect": "^7.0.0",
     "@stacks/network": "^5.0.0",
     "@tabler/icons": "^1.93.0",
@@ -39,6 +40,7 @@
     "lint": "next lint"
   },
   "devDependencies": {
+    "@openzeppelin/truffle-upgrades": "^1.20.1",
     "@types/node": "^20.6.0",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1"

@@ -23,12 +23,13 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
 
         return buyMeACoffee.giveCoffee(message, name, amount, {
             from: giver,
-            value: web3.utils.toWei('0.01', 'Ether') * amount
+            value: web3.utils.toWei('0.001', 'Ether') * amount
         });
     };
 
     before(async () => {
         buyMeACoffee = await BuyMeACoffee.new({from: deployer})
+        await buyMeACoffee.initialize({from: deployer});
         const contractAddress = buyMeACoffee.address;
     })
 
@@ -194,6 +195,9 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
 
     describe('withdraw', async () => {
 
+        buyMeACoffee = await BuyMeACoffee.new({from: deployer})
+        await buyMeACoffee.initialize({from: deployer});
+
         it('should not allow non-owner to withdraw', async () => {
             const owner = await buyMeACoffee.owner();
             const nonOwner = firstGiver;
@@ -228,4 +232,19 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
         });
 
     });
+
+
+
+    // describe('upgrade contract to v2', async () => {
+    //
+    //         it('should not allow non-owner to upgrade', async () => {
+    //             const owner = await buyMeACoffee.owner();
+    //             const nonOwner = firstGiver;
+    //             assert.notEqual(owner, nonOwner);
+    //             let message = "Only the owner can upgrade";
+    //             let err = await utils.shouldThrow(buyMeACoffee.upgradeContractToV2({from: nonOwner}));
+    //             expect(err.message.includes(message));
+    //         });
+    //
+    // });
 });

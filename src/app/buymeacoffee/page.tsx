@@ -68,6 +68,7 @@ export default function Page() {
             const network: Network = await library.getNetwork();
             const signer: JsonRpcSigner = library.getSigner();
             const contract: Contract = new ethers.Contract(contractAddress, contractABI, signer);
+            const contractName: string = await contract.name();
             const owner: string = await contract.owner();
             setOwner(owner);
             setContract(contract);

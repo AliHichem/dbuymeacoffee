@@ -3,15 +3,16 @@ pragma solidity ^0.8.19;
 
 // Dev only
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract BuyMeACoffee {
+contract BuyMeACoffee is Initializable  {
 
     // Define a variable called 'name' to store the name of the smart contact
     string public name;
     // Mark the owner address as payable so we can send them Ether
     address payable public owner;
     // Define a variable to track the number of coffees given
-    uint256 public coffeeCount = 0;
+    uint256 public coffeeCount;
     // Define a mapping of `uint256` to `Coffee` structs
     mapping(uint256 => Coffee) coffees;
 
@@ -42,8 +43,16 @@ contract BuyMeACoffee {
         uint256 amount
     );
 
-    constructor() {
+    // Native constructor is replaced by initialize function in upgradeable contracts
+    // @see https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable
+    //constructor() {
+    //    name = "Buy Me A Coffee";
+    //    owner = payable(msg.sender);
+    //}
+
+    function initialize() public initializer {
         name = "Buy Me A Coffee";
+        coffeeCount = 0;
         owner = payable(msg.sender);
     }
 
@@ -91,14 +100,12 @@ contract BuyMeACoffee {
         if (limit + index > coffeeCount) {
             limit = coffeeCount ;
         }
-
         // Create a new array of Coffee structs
         Coffee[] memory _coffees = new Coffee[](limit - index + 1);
         // Loop through the coffees
         for (uint256 i = index; i <= limit; i++) {
             // Get the coffee at the current index
             Coffee memory coffee = coffees[i];
-
             // Create a new coffee struct with only the specified attributes
             Coffee memory newCoffee;
             newCoffee.id = coffee.id;
@@ -106,11 +113,9 @@ contract BuyMeACoffee {
             newCoffee.message = coffee.message;
             newCoffee.timestamp = coffee.timestamp;
             newCoffee.amount = coffee.amount;
-
             // Add the new coffee to the array
             _coffees[i-index] = newCoffee;
         }
-
         // Return the array
         return _coffees;
     }
