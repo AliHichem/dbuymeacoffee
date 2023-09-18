@@ -2,8 +2,11 @@
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-contract BuyMeACoffee is UUPSUpgradeable  {
+contract BuyMeACoffeeV2 is UUPSUpgradeable  {
+
+    using SafeMath for uint256;
 
     // Define a variable called 'name' to store the name of the smart contact
     string public name;
@@ -67,7 +70,7 @@ contract BuyMeACoffee is UUPSUpgradeable  {
         // Make sure the sender balance is greater than the amount
         require(msg.sender.balance >= msg.value, "##The sender balance should be greater than the amount");
         // Increment the coffee count
-        coffeeCount ++;
+        coffeeCount = coffeeCount.add(1);
         // Create the coffee
         coffees[coffeeCount] = Coffee(coffeeCount, msg.sender, block.timestamp, _message, _name, _amount);
         // Trigger the event
@@ -94,12 +97,15 @@ contract BuyMeACoffee is UUPSUpgradeable  {
         require(limit > 0, "##The limit should be greater than zero");
         // Make sure the index is less than or equal to the coffee count
         require(index <= coffeeCount, "##The index should be less than or equal to the coffee count");
+        // Make sure the limit is smaller than 100
+        require(limit <= 100, "##The limit should be smaller than 100");
         // Make sure the limit + index is less than or equal to the coffee count
-        if (limit + index > coffeeCount) {
+        uint256 maxLimitIndex = limit.add(index);
+        if (maxLimitIndex > coffeeCount) {
             limit = coffeeCount ;
         }
         // Create a new array of Coffee structs
-        Coffee[] memory _coffees = new Coffee[](limit - index + 1);
+        Coffee[] memory _coffees = new Coffee[](limit.sub(index).add(1));
         // Loop through the coffees
         for (uint256 i = index; i <= limit; i++) {
             // Get the coffee at the current index
@@ -112,7 +118,7 @@ contract BuyMeACoffee is UUPSUpgradeable  {
             newCoffee.timestamp = coffee.timestamp;
             newCoffee.amount = coffee.amount;
             // Add the new coffee to the array
-            _coffees[i-index] = newCoffee;
+            _coffees[i.sub(index)] = newCoffee;
         }
         // Return the array
         return _coffees;

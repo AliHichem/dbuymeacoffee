@@ -25,7 +25,7 @@ import Web3Modal from "web3modal";
 import {providers} from "@/app/providers";
 import AuthButton from "@/components/AuthButton";
 import WithdrawButton from "@/components/WithdrawButton";
-import abi from "@/abis/BuyMeACoffee.json"
+import abi from "@/abis/BuyMeACoffeeV2.json"
 import {Network, Web3Provider} from "@ethersproject/providers";
 import {JsonRpcSigner} from "@ethersproject/providers/src.ts";
 
