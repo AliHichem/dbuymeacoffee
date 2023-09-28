@@ -77,9 +77,11 @@ contract('BuyMeACoffee', ([deployer, firstGiver, secondGiver]) => {
         });
 
         it('should emit the event correctly', async () => {
-            await giveRandomCoffee("Test message", "Test name", 1, firstGiver);
+            const amount = (19).toString();
+            await giveRandomCoffee("Test message", "Test name", amount, firstGiver);
             const events = await buyMeACoffee.getPastEvents('CoffeeGiven');
             expect(events.length).to.equal(1);
+            expect(events[0].returnValues.amount).to.equal(amount);
         });
 
     });

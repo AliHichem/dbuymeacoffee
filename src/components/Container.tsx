@@ -1,4 +1,11 @@
-export default function Container({ children, small }) {
+import React from "react";
+
+interface Props {
+    children: React.ReactNode;
+    small?: boolean;
+}
+
+export default function Container({ children, small = false }: Props) {
   return (
     <div className={`px-8 mx-auto md:px-8 ${small ? 'max-w-3xl' : 'max-w-4xl'}`}>
       {children}

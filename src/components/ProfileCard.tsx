@@ -1,14 +1,21 @@
 import Card from './Card';
 import Socials from './Socials';
+import Image from "next/image";
 
-export default function ProfileCard({ profile }) {
+interface ProfileCardProps {
+    profile: any;
+}
+
+export default function ProfileCard({ profile }: ProfileCardProps) {
   return (
     <Card>
       <div className="p-8 flex flex-col justify-center items-center text-center max-w-md mx-auto">
         {profile?.profileImageUrl && (
-          <img
+          <Image
             className="rounded-full object-cover shadow-lg w-24"
             src={profile.profileImageUrl}
+            width={96}
+            height={96}
             alt=""
           />
         )}

@@ -1,29 +1,39 @@
-import { StacksMainnet, StacksMocknet, StacksTestnet } from '@stacks/network';
+import {Network} from "@ethersproject/providers";
 
-const mainnet = new StacksMainnet();
-const testnet = new StacksTestnet();
-const devnet = new StacksMocknet();
+export interface NetworkMap extends Network {
+    type: string;
+    explorerUrl: string;
+    contractAddress: string;
+    supported: boolean;
+}
 
-export const getNetworkConfig = () => {
-  if (process.env.NEXT_PUBLIC_NETWORK === 'mainnet') {
-    return {
-      network: mainnet,
-      explorerUrl: 'https://explorer.stacks.co',
-      contractAddress: 'SP2PNJSEDHK8HZ0DE44JDT9T2Q429D86F4KJ9J5NM'
+export const supportedNetworks = [1,1337,11155111]
+
+export const getEnhancedNetwork = (network: Network): NetworkMap => {
+
+    const map: any = {
+        type: null,
+        explorerUrl: null,
+        contractAddress: null,
+        supported: supportedNetworks.includes(network.chainId)
     };
-  }
 
-  if (process.env.NEXT_PUBLIC_NETWORK === 'testnet') {
-    return {
-      network: testnet,
-      explorerUrl: 'https://explorer.stacks.co',
-      contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM'
-    };
-  }
-
-  return {
-    network: devnet,
-    explorerUrl: 'http://localhost:8000',
-    contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM'
-  };
+    switch (network.chainId) {
+        case 11155111:
+            map.type = 'sepolia';
+            map.explorerUrl = 'https://explorer.stacks.co';
+            map.contractAddress = process.env.CONTRACT_ADDRESS_TESTNET;
+            break;
+        case 1:
+            map.type = 'mainnet';
+            map.explorerUrl = 'https://explorer.stacks.co';
+            map.contractAddress = process.env.CONTRACT_ADDRESS_MAINNET;
+            break;
+        case 1337:
+            map.type = 'devnet';
+            map.explorerUrl = 'http://localhost:8000';
+            map.contractAddress = process.env.CONTRACT_ADDRESS_DEVNET;
+            break;
+    }
+    return {...network, ...map};
 };

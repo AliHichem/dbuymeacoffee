@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 
-export default function Card(props) {
+export default function Card(props: any) {
   return (
     <div
       {...props}

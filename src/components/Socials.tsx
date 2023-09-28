@@ -7,7 +7,17 @@ import {
 } from '@tabler/icons';
 import NewTabLink from './NewTabLink';
 
-export default function Socials({ socialIcons }) {
+interface SocialsProps {
+    socialIcons?: {
+        facebook?: string,
+        github?: string,
+        linkedin?: string,
+        twitter?: string,
+        website?: string
+    }
+}
+
+export default function Socials({ socialIcons }:SocialsProps) {
   const socials = [
     {
       name: 'Facebook',

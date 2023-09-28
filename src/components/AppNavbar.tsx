@@ -2,7 +2,15 @@ import Container from './Container';
 import Link from 'next/link';
 import AuthButton from './AuthButton';
 
-export default function AppNavbar({account, connectWallet, disconnect}) {
+
+type ConnectWalletFunction = () => Promise<void>;
+type DisconnectFunction = () => Promise<void>;
+
+export default function AppNavbar({account, connectWallet, disconnect}: {
+    account: string,
+    connectWallet: ConnectWalletFunction,
+    disconnect: DisconnectFunction
+}) {
 
     return (
         <div className="bg-white">

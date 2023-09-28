@@ -6,8 +6,10 @@ import {motion} from "framer-motion"
 import '@/assets/css/icomoon.css'
 import '@/assets/css/bootstrap.css'
 import '@/assets/css/style.css'
+import {Kaushan_Script} from "next/font/google";
+const kaushanScript = Kaushan_Script({subsets: ['latin-ext'], weight: '400'});
 
-export default function Home({Component, pageProps, router}) {
+export default function Home() {
 
     return (
         <motion.div
@@ -17,11 +19,7 @@ export default function Home({Component, pageProps, router}) {
         >
             <div id="page">
                 <header id="fh5co-header" className="fh5co-cover js-fullheight" role="banner"
-                        style={{
-                            backgroundImage: `url("/images/cover_bg_3.jpg")`,
-                            className: 'fh5co-cover',
-                            role: 'banner'
-                        }} data-stellar-background-ratio="0.5">
+                        style={{backgroundImage: `url("/images/cover_bg_3.jpg")`}} data-stellar-background-ratio="0.5">
                     <div className="overlay"></div>
                     <div className="container">
                         <div className="row">
@@ -31,8 +29,8 @@ export default function Home({Component, pageProps, router}) {
                                         <div className="profile-thumb" style={{
                                             backgroundImage: `url("/images/ali.jpeg")`
                                         }}></div>
-                                        <h1><span>Hichem Ali</span></h1>
-                                        <h3><span>Web Developer</span></h3>
+                                        <h1 className={kaushanScript.className} ><span>Hichem Ali</span></h1>
+                                        <h3 className={kaushanScript.className} ><span>Web Developer</span></h3>
                                         <ul className="fh5co-social-icons">
                                             <li><a href="https://github.com/AliHichem"><i
                                                 className="icon-github2"></i></a></li>

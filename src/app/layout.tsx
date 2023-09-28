@@ -1,25 +1,21 @@
-// import '@/assets/css/reboot.css'
 import '@/assets/css/globals.css'
+import {Ubuntu} from 'next/font/google'
+import {Toaster} from 'react-hot-toast';
 
-import { Inter } from 'next/font/google'
-import { Toaster } from 'react-hot-toast';
+const ubuntu = Ubuntu({subsets: ['latin-ext'], weight: '400'});
 
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Buy Me a Coffee Dapp',
-  description: 'Buy Me a Coffee Dapp on Ethereum blockchain',
+    title: 'Hichem Ali',
+    description: 'Buy Me a Coffee Dapp on Ethereum blockchain',
 }
 
-export default function RootLayout({ children }) {
-
-  return (
-    <html lang="en">
-        <head>
-          <link href="https://fonts.googleapis.com/css?family=Space+Mono" rel="stylesheet"/>
-          <link href="https://fonts.googleapis.com/css?family=Kaushan+Script" rel="stylesheet"/>
-        </head>
-      <body className={inter.className}>{children}<Toaster /></body>
-    </html>
-  )
+export default function RootLayout({children}: {
+    children: React.ReactNode
+}) {
+    return (
+        <html lang="en">
+        <body className={ubuntu.className}>{children}<Toaster/></body>
+        </html>
+    )
 }

@@ -1,7 +1,17 @@
 import classnames from 'classnames';
 import React from 'react';
 
-function InputWrapper({ label, rightHelper, prefix, suffix, error, helper, children }) {
+interface InputWrapperProps {
+    label?: string;
+    rightHelper?: React.ReactNode;
+    prefix?: React.ReactNode;
+    suffix?: React.ReactNode;
+    error?: any;
+    helper?: string;
+    children: React.ReactNode;
+}
+
+function InputWrapper({ label, rightHelper, prefix, suffix, error, helper, children }: InputWrapperProps) {
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -32,6 +42,19 @@ function InputWrapper({ label, rightHelper, prefix, suffix, error, helper, child
   );
 }
 
+interface InputProps {
+  register?: any;
+  name?: string;
+  prefix?: React.ReactNode;
+  validation?: any;
+  label?: string;
+  rightHelper?: React.ReactNode;
+  helper?: string;
+  suffix?: React.ReactNode;
+  error?: any;
+  [x: string]: any;
+}
+
 export function Input({
   register,
   name,
@@ -43,7 +66,7 @@ export function Input({
   suffix,
   error,
   ...rest
-}) {
+}: InputProps) {
   const inputWrapperProps = {
     label,
     rightHelper,
@@ -68,6 +91,20 @@ export function Input({
   );
 }
 
+interface TextAreaProps {
+    register?: any;
+    name?: string;
+    prefix?: React.ReactNode;
+    validation?: any;
+    label?: string;
+    rightHelper?: React.ReactNode;
+    helper?: string;
+    suffix?: React.ReactNode;
+    error?: any;
+    rows?: number;
+    [x: string]: any;
+}
+
 export function TextArea({
   register,
   name,
@@ -80,7 +117,7 @@ export function TextArea({
   error,
   rows = 3,
   ...rest
-}) {
+}: TextAreaProps) {
   const inputWrapperProps = {
     label,
     rightHelper,

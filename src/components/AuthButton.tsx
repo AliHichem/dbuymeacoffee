@@ -1,7 +1,14 @@
 import {PrimaryButton} from './Button';
 import {IconWallet} from "@tabler/icons";
 
-export default function AuthButton({account, connectWallet, disconnect}) {
+type ConnectWalletFunction = () => Promise<void>;
+type DisconnectFunction = () => Promise<void>;
+
+export default function AuthButton({account, connectWallet, disconnect}: {
+    account: string,
+    connectWallet: ConnectWalletFunction,
+    disconnect: DisconnectFunction
+}) {
     return (<>
             {!account ? (
                 <PrimaryButton onClick={connectWallet}>

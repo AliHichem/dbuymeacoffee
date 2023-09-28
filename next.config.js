@@ -1,6 +1,7 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    distDir: 'build',
     reactStrictMode: true,
     webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
         config.externals.push({
@@ -10,10 +11,13 @@ const nextConfig = {
         return config
     },
     env: {
-        CONTRACT_ADDRESS: process.env.CONTRACT_ADDRESS,
+        CONTRACT_ADDRESS_DEVNET: process.env.CONTRACT_ADDRESS_DEVNET,
+        CONTRACT_ADDRESS_TESTNET: process.env.CONTRACT_ADDRESS_TESTNET,
+        CONTRACT_ADDRESS_MAINNET: process.env.CONTRACT_ADDRESS_MAINNET,
         NEXT_PUBLIC_NETWORK: process.env.NEXT_PUBLIC_NETWORK,
         ETHER_UNIT: process.env.ETHER_UNIT,
-        COFFEES_LISTING_LIMIT: process.env.COFFEES_LISTING_LIMIT
+        COFFEES_LISTING_LIMIT: process.env.COFFEES_LISTING_LIMIT,
+
     }
 }
 
