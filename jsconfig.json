@@ -4,5 +4,11 @@
       "@/*": ["./src/*"]
     },
     "baseUrl": "."
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "build",
+    "cache",
+    "artifacts"
+  ]
 }

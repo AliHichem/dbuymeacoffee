@@ -7,8 +7,8 @@ const nextConfig = {
         config.externals.push({
             'utf-8-validate': 'commonjs utf-8-validate',
             'bufferutil': 'commonjs bufferutil',
-        })
-        return config
+        });
+        return config;
     },
     env: {
         CONTRACT_ADDRESS_DEVNET: process.env.CONTRACT_ADDRESS_DEVNET,
@@ -16,8 +16,7 @@ const nextConfig = {
         CONTRACT_ADDRESS_MAINNET: process.env.CONTRACT_ADDRESS_MAINNET,
         NEXT_PUBLIC_NETWORK: process.env.NEXT_PUBLIC_NETWORK,
         ETHER_UNIT: process.env.ETHER_UNIT,
-        COFFEES_LISTING_LIMIT: process.env.COFFEES_LISTING_LIMIT,
-
+        COFFEES_LISTING_LIMIT: process.env.COFFEES_LISTING_LIMIT
     }
 }
 

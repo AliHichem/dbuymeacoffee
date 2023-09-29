@@ -4,7 +4,6 @@ import {Toaster} from 'react-hot-toast';
 
 const ubuntu = Ubuntu({subsets: ['latin-ext'], weight: '400'});
 
-
 export const metadata = {
     title: 'Hichem Ali',
     description: 'Buy Me a Coffee Dapp on Ethereum blockchain',

@@ -6,13 +6,13 @@ export const providers = {
         package: CoinbaseWalletSDK, // Required
         options: {
             appName: "Buy me a coffee", // Required
-            infuraId: process.env.INFURA_KEY // Required unless you provide a JSON RPC url; see `rpc` below
+            infuraId: process.env.INFURA_API_KEY // Required unless you provide a JSON RPC url; see `rpc` below
         }
     },
     walletconnect: {
         package: WalletConnect, // required
         options: {
-            infuraId: process.env.INFURA_KEY // required
+            infuraId: process.env.INFURA_API_KEY // required
         }
     }
 };

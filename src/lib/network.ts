@@ -7,6 +7,14 @@ export interface NetworkMap extends Network {
     supported: boolean;
 }
 
+/**
+ * Supported networks
+ * @type {number[]}
+ *
+ *  1: mainnet
+ *  1337: devnet
+ *  11155111: sepolia
+ */
 export const supportedNetworks = [1,1337,11155111]
 
 export const getEnhancedNetwork = (network: Network): NetworkMap => {

@@ -23,7 +23,7 @@ import {providers} from "@/app/providers";
 import AuthButton from "@/components/AuthButton";
 import WithdrawButton from "@/components/WithdrawButton";
 import abi from "@/abis/BuyMeACoffeeV2.json"
-import {Network, Web3Provider} from "@ethersproject/providers";
+import {Web3Provider} from "@ethersproject/providers";
 import {JsonRpcSigner} from "@ethersproject/providers/src.ts";
 
 const coffeesLimit: number = process.env.COFFEES_LISTING_LIMIT;
