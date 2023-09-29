@@ -37,14 +37,10 @@
     "baseUrl": "."
   },
   "include": [
-    "**/*.ts",
-    ".next/types/**/*.ts",
-    "next-env.d.ts",
-    "**/*.tsx",
-    "**/*.jsx",
     "build/types/**/*.ts"
   ],
   "exclude": [
+    "src/assets",
     "node_modules",
     "build",
     "cache",

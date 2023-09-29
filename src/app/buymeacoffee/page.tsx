@@ -25,6 +25,7 @@ import WithdrawButton from "@/components/WithdrawButton";
 import abi from "@/abis/BuyMeACoffeeV2.json"
 import {Web3Provider} from "@ethersproject/providers";
 import {JsonRpcSigner} from "@ethersproject/providers/src.ts";
+import {Web3Provider} from "@coinbase/wallet-sdk/dist/provider/Web3Provider";
 
 const coffeesLimit: number = process.env.COFFEES_LISTING_LIMIT;
 const etherUnit: string = process.env.ETHER_UNIT;
@@ -50,12 +51,8 @@ export default function Page() {
     const [owner, setOwner] = useState<string>('');
     const [rawBalance, setRawBalance] = useState<bigint>();
     const [balance, setBalance] = useState<number>();
-    const web3Modal = new Web3Modal({
-        cacheProvider: true, // optional
-        providerOptions: providers, // required
-        theme: "dark"
-    });
     const eventSubscriptionSet = new Set();
+    const [web3Modal, setWeb3Modal] = useState<Web3Modal>({});
 
     /**
      * Connect wallet
@@ -279,10 +276,20 @@ export default function Page() {
     };
 
     /**
+     * Initialize web3Modal once the component is mounted
      * Set the mounted state to true once the component is mounted
-     * - This is used to prevent the connectWallet method to be called on page load
      */
-    useEffect(() => setMounted(true), []);
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const web3Modal = new Web3Modal({
+                cacheProvider: true, // optional
+                providerOptions: providers, // required
+                theme: "dark"
+            });
+            setWeb3Modal(web3Modal);
+            setMounted(true)
+        }
+    }, []);
 
     /**
      * Connect wallet on page load or on chainId change (user connected to a different network)
@@ -305,7 +312,6 @@ export default function Page() {
             }
         })();
     }, [chainId]);
-
 
     /**
      * Setup listeners for accountsChanged, chainChanged and disconnect once the provider is set
