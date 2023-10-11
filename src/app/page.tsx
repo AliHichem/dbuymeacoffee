@@ -1,6 +1,6 @@
 
 // import home component
-import Home from './home'
+import Page from './home/page'
 export default function Main() {
-    return <Home/>
+    return <Page/>
 }

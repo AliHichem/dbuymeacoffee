@@ -16,7 +16,7 @@ interface Props {
     theme?: 'light' | 'dark' | 'snow' | 'lilac'
 }
 
-export default function ConfirmToast({
+export const ConfirmToast = ({
                                          asModal = false,
                                          children,
                                          childrenClassName,
@@ -27,7 +27,7 @@ export default function ConfirmToast({
                                          message = 'Do you want to continue?',
                                          position = 'bottom-right',
                                          theme = 'light',
-                                         ...props }: Props) {
+                                         ...props }: Props) => {
 
     function Wrapper({ asModal, children }: { asModal: boolean, children: React.ReactNode }): JSX.Element {
         if (asModal) {

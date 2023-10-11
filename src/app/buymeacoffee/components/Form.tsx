@@ -55,7 +55,7 @@ interface InputProps {
   [x: string]: any;
 }
 
-export function Input({
+export const Input = ({
   register,
   name,
   prefix,
@@ -66,7 +66,7 @@ export function Input({
   suffix,
   error,
   ...rest
-}: InputProps) {
+}: InputProps) => {
   const inputWrapperProps = {
     label,
     rightHelper,
@@ -105,7 +105,7 @@ interface TextAreaProps {
     [x: string]: any;
 }
 
-export function TextArea({
+export const TextArea = ({
   register,
   name,
   prefix,
@@ -117,7 +117,7 @@ export function TextArea({
   error,
   rows = 3,
   ...rest
-}: TextAreaProps) {
+}: TextAreaProps) => {
   const inputWrapperProps = {
     label,
     rightHelper,

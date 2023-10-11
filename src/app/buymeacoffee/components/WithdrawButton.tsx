@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion"
 
-const WithdrawButton = () => {
+export const WithdrawButton = () => {
     return (
         <motion.button
             whileHover={{ scale: 1.05 }}
@@ -12,5 +12,3 @@ const WithdrawButton = () => {
         </motion.button>
     );
 };
-
-export default WithdrawButton;

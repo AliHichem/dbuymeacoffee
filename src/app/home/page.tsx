@@ -9,7 +9,7 @@ import '@/assets/css/style.css'
 import {Kaushan_Script} from "next/font/google";
 const kaushanScript = Kaushan_Script({subsets: ['latin-ext'], weight: '400'});
 
-export default function Home() {
+export default function Page() {
 
     return (
         <motion.div

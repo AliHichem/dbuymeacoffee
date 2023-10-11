@@ -1,12 +1,11 @@
-import Card from './Card';
-import Socials from './Socials';
+import {Card,Socials} from './';
 import Image from "next/image";
 
 interface ProfileCardProps {
     profile: any;
 }
 
-export default function ProfileCard({ profile }: ProfileCardProps) {
+export const ProfileCard = ({ profile }: ProfileCardProps) => {
   return (
     <Card>
       <div className="p-8 flex flex-col justify-center items-center text-center max-w-md mx-auto">

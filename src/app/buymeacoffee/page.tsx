@@ -2,13 +2,20 @@
 
 import {useState, useEffect} from 'react';
 import {Contract, ethers, ContractInterface, utils} from "ethers";
-import AppNavbar from '@/components/AppNavbar';
-import Container from '@/components/Container';
-import {Input, TextArea} from '@/components/Form';
-import NewTabLink from '@/components/NewTabLink';
-import ProfileCard from '@/components/ProfileCard';
-import {PrimaryButton} from '@/components/Button';
-import Card from '@/components/Card';
+import {
+    AuthButton,
+    AppNavbar,
+    Card,
+    ConfirmToast,
+    Container,
+    SelectItem,
+    PrimaryButton,
+    ProfileCard,
+    NewTabLink,
+    Input,
+    TextArea,
+    WithdrawButton
+} from "@/app/buymeacoffee/components";
 import {
     mapResultsFromTx,
     profile,
@@ -17,11 +24,8 @@ import {
 import {IconLoader2} from '@tabler/icons';
 import {motion} from "framer-motion"
 import toast from 'react-hot-toast';
-import ConfirmToast from '@/components/ConfirmToast';
 import Web3Modal from "web3modal";
 import {providers} from "@/app/providers";
-import AuthButton from "@/components/AuthButton";
-import WithdrawButton from "@/components/WithdrawButton";
 import abi from "@/abis/BuyMeACoffeeV2.json"
 import {Web3Provider} from "@ethersproject/providers";
 import {JsonRpcSigner} from "@ethersproject/providers/src.ts";
@@ -269,10 +273,10 @@ export default function Page() {
      * - clears the eventSubscriptionSet used to keep track of the subscriptions
      */
     const unsubscribeFromEvents = () => {
-        if(contract) {
+        if (contract) {
             contract.removeAllListeners();
         }
-            eventSubscriptionSet.clear();
+        eventSubscriptionSet.clear();
     };
 
     /**
@@ -524,16 +528,3 @@ export default function Page() {
         </motion.div>
     );
 }
-
-const SelectItem = ({price, currentValue, setPrice}) => (
-    <div
-        className={`font-semibold  flex items-center border justify-center w-8 h-8 rounded-full cursor-pointer ${
-            price == currentValue
-                ? 'bg-orange-500 text-white'
-                : 'text-orange-500 bg-white border-blue-100'
-        }`}
-        onClick={() => setPrice(currentValue)}
-    >
-        {currentValue}
-    </div>
-);
