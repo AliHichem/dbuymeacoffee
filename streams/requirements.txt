@@ -1,0 +1,7 @@
+# to extract requirements run 'pipreqs . --force' in the terminal
+Flask==3.0.0
+Flask_Cors==4.0.0
+python-decouple==3.4
+Jinja2==3.1.2
+
+

@@ -62,3 +62,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+#python scripts venv
+streams/venv
+streams/.env
