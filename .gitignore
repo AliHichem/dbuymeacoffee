@@ -17,7 +17,7 @@ artifacts
 .pnp.js
 .pnp.cjs
 .pnp.loader.mjs
-/.yarn
+.yarn/cache
 .openzeppelin
 
 # testing
