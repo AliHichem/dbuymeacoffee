@@ -29,7 +29,8 @@ import {providers} from "@/app/providers";
 import abi from "@/abis/BuyMeACoffeeV2.json"
 import {Web3Provider} from "@ethersproject/providers";
 import {JsonRpcSigner} from "@ethersproject/providers/src.ts";
-import {Web3Provider} from "@coinbase/wallet-sdk/dist/provider/Web3Provider";
+import Image from 'next/image'
+// import {Web3Provider} from "@coinbase/wallet-sdk/dist/provider/Web3Provider";
 
 const coffeesLimit: number = process.env.COFFEES_LISTING_LIMIT;
 const etherUnit: string = process.env.ETHER_UNIT;
@@ -361,7 +362,16 @@ export default function Page() {
         >
             <AppNavbar account={account} connectWallet={connectWallet} disconnect={disconnect}/>
             <Container>
-                <div className="mx-auto mt-8">
+                <div className="md:flex justify-center pt-8 max-w mb-8">
+                    <div className="flex flex-col mx-auto mt-8">
+                        <Image
+                            src="/images/Buy_Me_a_Coffee_Logo.png"
+                            width={60}
+                            height={30}
+                            alt="Picture of the author"
+                        />
+                    </div>
+                <div className="mx-auto mt-4">
                     <div className="text-lg font-medium leading-6 text-gray-900 flex space-x-2">
                         <div>Hey there !</div>
                     </div>
@@ -386,6 +396,7 @@ export default function Page() {
           </NewTabLink>
         </span>
                     </div>
+                </div>
                 </div>
                 {(account === owner) ? (<div className="mx-auto mt-8">
                     <div className="mt-4 sm:mt-0">
