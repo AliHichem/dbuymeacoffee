@@ -23,9 +23,6 @@ artifacts
 # testing
 /coverage
 
-# compiled
-/src/abis
-
 # production
 /build
 
