@@ -76,7 +76,13 @@ jobs:
       # create .env file from github environment variables
       - name: 'Create env file'
         run: |
-          echo "${{ secrets.ENV_FILE }}" > .env
+          touch .env
+          echo CONTRACT_ADDRESS_DEVNET=${{ secrets.CONTRACT_ADDRESS_DEVNET }} >> .env
+          echo CONTRACT_ADDRESS_TESTNET=${{ secrets.CONTRACT_ADDRESS_TESTNET }} >> .env
+          echo CONTRACT_ADDRESS_MAINNET=${{ secrets.CONTRACT_ADDRESS_MAINNET }} >> .env
+          echo NEXT_PUBLIC_NETWORK=${{ secrets.NEXT_PUBLIC_NETWORK }} >> .env
+          echo ETHER_UNIT=${{ secrets.ETHER_UNIT }} >> .env
+          echo COFFEES_LISTING_LIMIT=${{ secrets.COFFEES_LISTING_LIMIT }} >> .env
           cat .env
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
