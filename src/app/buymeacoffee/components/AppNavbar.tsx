@@ -1,14 +1,7 @@
-import {AuthButton,Container} from './';
+import {Container} from './';
 import Link from 'next/link';
 
-type ConnectWalletFunction = () => Promise<void>;
-type DisconnectFunction = () => Promise<void>;
-
-export const AppNavbar = ({account, connectWallet, disconnect}: {
-    account: string,
-    connectWallet: ConnectWalletFunction,
-    disconnect: DisconnectFunction
-}) => {
+export const AppNavbar = () => {
 
     return (
         <div className="bg-white">
@@ -24,7 +17,8 @@ export const AppNavbar = ({account, connectWallet, disconnect}: {
                         </div>
                     </Link>
                     <div className="flex justify-center space-x-6 md:order-2">
-                        <AuthButton account={account} connectWallet={connectWallet} disconnect={disconnect}/>
+                        <w3m-network-button />
+                        <w3m-button />
                     </div>
                 </div>
             </Container>

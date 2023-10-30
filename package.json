@@ -4,7 +4,6 @@
   "description": "An Ethereum Buy Me A Coffee DApp",
   "author": "ali.hichem@mail.com",
   "dependencies": {
-    "@coinbase/wallet-sdk": "3.0.1",
     "@headlessui/react": "^1.7.3",
     "@openzeppelin/contracts": "^4.9.3",
     "@openzeppelin/contracts-upgradeable": "^4.9.3",
@@ -13,7 +12,8 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "@walletconnect/web3-provider": "1.7.3",
+    "@wagmi/core": "^1.4.5",
+    "@web3modal/wagmi": "^3.1.0",
     "autoprefixer": "10.4.15",
     "classnames": "^2.3.1",
     "classnames-creator": "^1.0.6",
@@ -29,13 +29,14 @@
     "react-icons": "^4.11.0",
     "sass": "^1.66.1",
     "tailwindcss": "3.3.3",
-    "web-vitals": "^2.1.4",
-    "web3modal": "^1.9.12"
+    "viem": "^1.17.1",
+    "wagmi": "^1.4.5",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "dev": "next dev -p 3333",
+    "dev": "next dev -p 3000",
     "build": "next build",
-    "start": "next start -p 3333",
+    "start": "next start -p 3000",
     "lint": "next lint"
   },
   "devDependencies": {

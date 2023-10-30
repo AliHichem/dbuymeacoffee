@@ -18,6 +18,7 @@
     "allowJs": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "strictPropertyInitialization": false,
     "noEmit": true,
     "incremental": true,
     "moduleResolution": "node",
@@ -37,7 +38,8 @@
     "baseUrl": "."
   },
   "include": [
-    "build/types/**/*.ts"
+    "build/types/**/*.ts",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "src/assets",

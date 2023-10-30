@@ -1,5 +1,4 @@
 export * from './AppNavbar';
-export * from './AuthButton';
 export * from './Button';
 export * from './Card';
 export * from './ConfirmToast';

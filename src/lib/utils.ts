@@ -33,8 +33,8 @@ export const mapResultsFromTx = (results: TransactionResult[]): Donor[] => {
 }
 
 export const getError = (error: any): [number, string] => {
-    const _code = error?.data?.code;
-    const _error = error?.data?.message;
+    const _code = error?.data?.code ?? error?.code ?? 0;
+    const _error = error?.data?.message ?? error?.message ?? "";
     // keep all string after the first "##"
     const _message = _error?.split("##")[1];
     return [_code, _message];

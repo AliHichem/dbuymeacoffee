@@ -1,6 +1,6 @@
 import {Network} from "@ethersproject/providers";
 
-export interface NetworkMap extends Network {
+export interface NetworkMap {
     type: string;
     explorerUrl: string;
     contractAddress: string;
@@ -17,16 +17,16 @@ export interface NetworkMap extends Network {
  */
 export const supportedNetworks = [1,1337,11155111]
 
-export const getEnhancedNetwork = (network: Network): NetworkMap => {
+export const getNetwork = (chain): NetworkMap => {
 
     const map: any = {
         type: null,
         explorerUrl: null,
         contractAddress: null,
-        supported: supportedNetworks.includes(network.chainId)
+        supported: supportedNetworks.includes(chain.id)
     };
 
-    switch (network.chainId) {
+    switch (chain.id) {
         case 11155111:
             map.type = 'sepolia';
             map.explorerUrl = 'https://explorer.stacks.co';
@@ -43,5 +43,5 @@ export const getEnhancedNetwork = (network: Network): NetworkMap => {
             map.contractAddress = process.env.CONTRACT_ADDRESS_DEVNET;
             break;
     }
-    return {...network, ...map};
+    return map;
 };
