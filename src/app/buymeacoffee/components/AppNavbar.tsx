@@ -17,7 +17,6 @@ export const AppNavbar = () => {
                         </div>
                     </Link>
                     <div className="flex justify-center space-x-6 md:order-2">
-                        <w3m-network-button />
                         <w3m-button />
                     </div>
                 </div>

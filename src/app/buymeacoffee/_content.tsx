@@ -210,16 +210,16 @@ export default function PageContent() {
                 value: value,
                 account: account.address
             };
-            const estimate = await contract.estimateGas.giveCoffee(args, opts)
-            const simulate = await contract.simulate.giveCoffee(args, opts)
-            const hash = await contract.write.giveCoffee(args, opts);
+            const {estimate} = await contract.estimateGas.giveCoffee(args, opts)
+            const {simulate} = await contract.simulate.giveCoffee(args, opts)
+            const {hash} = await contract.write.giveCoffee(args, opts);
             toast.success('Thank you for the support! Your donation will be processed soon.');
             // clear the form values
             setMessage('');
             setName('');
             setAmount(3);
         } catch (error) {
-            console.log('@@@@@@@@@@ Vanilla error message', error);
+            setLoading(false);
             const [_code, _message] = getError(error);
             toast.error(`${_code}: ${_message}`);
             // console.trace("SM.Error:", _message, _code);
@@ -378,7 +378,7 @@ export default function PageContent() {
             animate={{opacity: 1, scale: 1}}
             transition={{duration: 0.5}}
         >
-            <AppNavbar account={account} connectWallet={connectWallet} disconnect={disconnect}/>
+            <AppNavbar />
             <Container>
                 <div className="md:flex justify-center pt-8 max-w mb-8">
                     <div className="flex flex-col mx-auto mt-8">

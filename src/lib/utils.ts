@@ -1,3 +1,5 @@
+import {BaseError, ContractFunctionExecutionError, ContractFunctionRevertedError} from "viem";
+
 export interface TransactionResult {
     id: string;
     name: string;
@@ -33,9 +35,24 @@ export const mapResultsFromTx = (results: TransactionResult[]): Donor[] => {
 }
 
 export const getError = (error: any): [number, string] => {
-    const _code = error?.data?.code ?? error?.code ?? 0;
-    const _error = error?.data?.message ?? error?.message ?? "";
-    // keep all string after the first "##"
-    const _message = _error?.split("##")[1];
+    let _code: number = 0;
+    let _message: string = "";
+    let _error: any = null;
+    if (error instanceof BaseError) {
+        const revertError = error.walk(err => err instanceof ContractFunctionRevertedError)
+        const executionError = error.walk(err => err instanceof ContractFunctionExecutionError)
+        if(executionError instanceof ContractFunctionExecutionError) {
+            _code = 2;
+            _message = executionError?.details?.split("##")[1];
+        } else if (revertError instanceof ContractFunctionRevertedError) {
+            _code = 1;
+            _message = revertError?.data.args[0].split("##")[1];
+        }
+    } else {
+        _code = error?.data?.code ?? error?.code ?? 0;
+        _error = error?.data?.message ?? error?.message ?? "";
+        // keep all string after the first "##"
+        _message = _error?.split("##")[1];
+    }
     return [_code, _message];
 }

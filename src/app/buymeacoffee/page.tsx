@@ -1,9 +1,9 @@
 'use client'
 
-import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react'
-import { WagmiConfig } from 'wagmi'
-import { arbitrum, sepolia, mainnet, localhost } from 'wagmi/chains'
-import { useState } from "react";
+import {createWeb3Modal, defaultWagmiConfig} from '@web3modal/wagmi/react'
+import {WagmiConfig} from 'wagmi'
+import {arbitrum, sepolia, mainnet, localhost} from 'wagmi/chains'
+import {useState} from "react";
 import PageContent from "./_content";
 
 const projectId = '119731842fced63569edee9c2ea8e54b'
@@ -14,10 +14,17 @@ const metadata = {
     icons: ['https://avatars.mywebsite.com/']
 }
 
-const chains = [localhost, sepolia, mainnet ]
-const wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
+const chains = [localhost, sepolia, mainnet]
+const wagmiConfig = defaultWagmiConfig({chains, projectId, metadata})
 
-createWeb3Modal({ wagmiConfig, projectId, chains })
+createWeb3Modal({
+    wagmiConfig, projectId, chains,
+    themeVariables: {
+        "--w3m-accent": "rgb(234 88 12)",
+        "--w3m-font-size-master": ".5rem",
+        "--w3m-border-radius-master": "1px",
+    }
+})
 
 export default function Page() {
     const [isNetworkSwitchHighlighted, setIsNetworkSwitchHighlighted] =
