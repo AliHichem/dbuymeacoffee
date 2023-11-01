@@ -79,14 +79,6 @@ export default function PageContent() {
      * updated when the user changes the network or change the account
      */
     const updateContract = async () => {
-
-        console.log('process.env',process.env.COFFEES_LISTING_LIMIT);
-        console.log('process.env',process.env.ETHER_UNIT);
-        console.log('process.env',process.env.NEXT_PUBLIC_NETWORK);
-        console.log('process.env',process.env.CONTRACT_ADDRESS_DEVNET);
-        console.log('process.env',process.env.CONTRACT_ADDRESS_TESTNET);
-        console.log('process.env',process.env.CONTRACT_ADDRESS_MAINNET);
-
         await setContract(null);
         await setNetwork(null);
         const account: GetAccountResult = await getAccount();
@@ -365,6 +357,12 @@ export default function PageContent() {
     useEffect(() => {
         if (typeof window !== "undefined") {
             setMounted(true)
+            console.log('process.env',process.env.COFFEES_LISTING_LIMIT);
+            console.log('process.env',process.env.ETHER_UNIT);
+            console.log('process.env',process.env.NEXT_PUBLIC_NETWORK);
+            console.log('process.env',process.env.CONTRACT_ADDRESS_DEVNET);
+            console.log('process.env',process.env.CONTRACT_ADDRESS_TESTNET);
+            console.log('process.env',process.env.CONTRACT_ADDRESS_MAINNET);
         }
     }, []);
 
