@@ -1,7 +1,7 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // output: 'export',
+    output: 'export',
     distDir: 'build',
     reactStrictMode: true,
     webpack: (config, context) => {
