@@ -44,8 +44,8 @@ import {parseEther, createWalletClient, custom, Transport, Abi, WatchContractEve
 
 type EthereumProvider = { request(...args: any): Promise<any> }
 
-const coffeesLimit: number = Number(process.env.COFFEES_LISTING_LIMIT);
-const etherUnit: number = Number(process.env.ETHER_UNIT);
+const coffeesLimit: number = Number(process.env.NEXT_PUBLIC_COFFEES_LISTING_LIMIT);
+const etherUnit: number = Number(process.env.NEXT_PUBLIC_ETHER_UNIT);
 const contractABI: ContractInterface = abi.abi;
 
 export default function PageContent() {
@@ -357,12 +357,12 @@ export default function PageContent() {
     useEffect(() => {
         if (typeof window !== "undefined") {
             setMounted(true)
-            console.log('process.env',process.env.COFFEES_LISTING_LIMIT);
-            console.log('process.env',process.env.ETHER_UNIT);
-            console.log('process.env',process.env.NEXT_PUBLIC_NETWORK);
-            console.log('process.env',process.env.CONTRACT_ADDRESS_DEVNET);
-            console.log('process.env',process.env.CONTRACT_ADDRESS_TESTNET);
-            console.log('process.env',process.env.CONTRACT_ADDRESS_MAINNET);
+            console.log('process.env',process.env.NEXT_PUBLIC_COFFEES_LISTING_LIMIT);
+            console.log('process.env',process.env.NEXT_PUBLIC_ETHER_UNIT);
+            console.log('process.env',process.env.NEXT_PUBLIC_NEXT_PUBLIC_NETWORK);
+            console.log('process.env',process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_DEVNET);
+            console.log('process.env',process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_TESTNET);
+            console.log('process.env',process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MAINNET);
         }
     }, []);
 
