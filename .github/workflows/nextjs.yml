@@ -78,11 +78,11 @@ jobs:
         run: |
           touch .env
           echo "NEXT_PUBLIC_CONTRACT_ADDRESS_DEVNET=${{ secrets.CONTRACT_ADDRESS_DEVNET }}" >> .env
-          echo "NEXT_PUBLIC_CONTRACT_ADDRESS_TESTNET=${{ env.CONTRACT_ADDRESS_TESTNET }}" >> .env
-          echo "NEXT_PUBLIC_CONTRACT_ADDRESS_MAINNET=$CONTRACT_ADDRESS_MAINNET" >> .env
+          echo "NEXT_PUBLIC_CONTRACT_ADDRESS_TESTNET=${{ secrets.CONTRACT_ADDRESS_TESTNET }}" >> .env
+          echo "NEXT_PUBLIC_CONTRACT_ADDRESS_MAINNET=${{ secrets.CONTRACT_ADDRESS_MAINNET }}" >> .env
           echo "NEXT_PUBLIC_NETWORK=${{ vars.NEXT_PUBLIC_NETWORK }}" >> .env
-          echo NEXT_PUBLIC_ETHER_UNIT=${{ vars.ETHER_UNIT }} >> .env
-          echo NEXT_PUBLIC_COFFEES_LISTING_LIMIT=$COFFEES_LISTING_LIMIT >> .env
+          echo "NEXT_PUBLIC_ETHER_UNIT=${{ vars.ETHER_UNIT }}" >> .env
+          echo "NEXT_PUBLIC_COFFEES_LISTING_LIMIT=${{ vars.COFFEES_LISTING_LIMIT}}" >> .env
           cat .env
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
