@@ -29,6 +29,7 @@
     "react-icons": "^4.11.0",
     "sass": "^1.66.1",
     "tailwindcss": "3.3.3",
+    "typescript": "^5.0.4",
     "viem": "^1.17.1",
     "wagmi": "^1.4.5",
     "web-vitals": "^2.1.4"

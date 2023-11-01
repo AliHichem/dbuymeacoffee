@@ -1,4 +1,4 @@
-import {Network} from "@ethersproject/providers";
+import {Chain} from "viem/types/chain";
 
 export interface NetworkMap {
     type: string;
@@ -17,7 +17,7 @@ export interface NetworkMap {
  */
 export const supportedNetworks = [1,1337,11155111]
 
-export const getNetwork = (chain): NetworkMap => {
+export const getNetwork = (chain: any): NetworkMap => {
 
     const map: any = {
         type: null,

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { CgClose } from 'react-icons/cg';
 import classnames from 'classnames-creator'
+
+// typeqcript ignore
+// @ts-ignore
 import s from '@/styles/ConfirmToast.module.scss'
 
 interface Props {

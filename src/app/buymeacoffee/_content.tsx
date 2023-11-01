@@ -1,7 +1,7 @@
 'use client'
 
-import {useState, useEffect} from 'react';
-import {Contract, ethers, ContractInterface} from "ethers";
+import {useState, useEffect, ChangeEvent, FormEvent} from 'react';
+import {ethers, ContractInterface} from "ethers";
 import {
     AppNavbar,
     Card,
@@ -35,12 +35,17 @@ import {
     getAccount,
     watchContractEvent,
     getNetwork as viemGetNetwork,
+    GetAccountResult,
+    GetNetworkResult,
+    Address,
+    GetContractResult,
 } from '@wagmi/core'
-import {parseEther, createWalletClient, custom} from "viem";
-import {mainnet, sepolia, localhost} from 'viem/chains'
+import {parseEther, createWalletClient, custom, Transport, Abi, WatchContractEventOnLogsParameter} from "viem";
 
-const coffeesLimit: number = process.env.COFFEES_LISTING_LIMIT;
-const etherUnit: string = process.env.ETHER_UNIT;
+type EthereumProvider = { request(...args: any): Promise<any> }
+
+const coffeesLimit: number = Number(process.env.COFFEES_LISTING_LIMIT);
+const etherUnit: number = Number(process.env.ETHER_UNIT);
 const contractABI: ContractInterface = abi.abi;
 
 export default function PageContent() {
@@ -55,17 +60,17 @@ export default function PageContent() {
     const {data: walletClient, isError, isLoading} = useWalletClient();
     const [mounted, setMounted] = useState<boolean>(false); // looks unused but do not remove it !
     const [donors, setDonors] = useState<Donor[]>([]);
-    const [donorsCount, setDonorsCount] = useState<number>(null);
+    const [donorsCount, setDonorsCount] = useState<number>(0);
     const [name, setName] = useState<string>('');
     const [amount, setAmount] = useState<number>(3);
     const [message, setMessage] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
-    const [account, setAccount] = useState<string>(null);
-    const [network, setNetwork] = useState<NetworkMap>();
-    const [contract, setContract] = useState<Contract>(null);
-    const [owner, setOwner] = useState<string>('');
-    const [rawBalance, setRawBalance] = useState<bigint>();
-    const [balance, setBalance] = useState<number>();
+    const [account, setAccount] = useState<string>();
+    const [network, setNetwork] = useState<NetworkMap | null>(null);
+    const [contract, setContract] = useState<GetContractResult | null>(null);
+    const [owner, setOwner] = useState<string | null>();
+    const [rawBalance, setRawBalance] = useState<bigint | null>();
+    const [balance, setBalance] = useState<number | null>();
     const [events, setEvents] = useState<any>({});
 
     /**
@@ -76,27 +81,22 @@ export default function PageContent() {
     const updateContract = async () => {
         await setContract(null);
         await setNetwork(null);
-        const account = await getAccount();
-        const viemNetwork = await viemGetNetwork();
-        const chains = {
-            'mainnet': mainnet,
-            'sepolia': sepolia,
-            'localhost': localhost,
-        };
-        const chain = chains[viemNetwork.chain.network] ?? null;
+        const account: GetAccountResult = await getAccount();
+        const viemNetwork: GetNetworkResult = await viemGetNetwork();
         const wallet = createWalletClient({
-            account: account,
-            chain: chain,
-            transport: custom(window.ethereum)
+            account: account.address as Address,
+            chain: viemNetwork?.chain,
+            transport: custom(window.ethereum as EthereumProvider) as Transport
         })
-        const network = getNetwork(viemNetwork.chain);
-        const contract = getContract({
-            address: network.contractAddress,
-            abi: contractABI,
-            // chain: viemNetwork.chain,
+        const network:NetworkMap = getNetwork(viemNetwork.chain);
+        const contract: GetContractResult = getContract({
+            address: network.contractAddress as Address,
+            abi: contractABI as Abi,
             walletClient: wallet
         });
-        const owner: string = await contract.read.owner();
+        console.log(contract.constructor.name);
+        console.log(contract);
+        const owner: string = (await contract.read.owner()) as string;
         await setOwner(owner);
         setNetwork(network);
         setContract(contract);
@@ -125,7 +125,7 @@ export default function PageContent() {
      */
     const refreshState = () => {
         setContract(null);
-        setAccount(null);
+        setAccount('');
         setNetwork(null);
         setOwner(null);
         setRawBalance(null);
@@ -159,15 +159,17 @@ export default function PageContent() {
     };
 
     // const handleMessageChange = e => setMessage(emojiStrip(e.target.value));
-    const handleMessageChange = e => setMessage(e.target.value);
-    const handleNameChange = e => setName(e.target.value);
-    const handleAmountChange = e => setAmount(Math.floor(e.target.value));
+    const handleMessageChange = (e: ChangeEvent<HTMLInputElement>) => setMessage(e.target.value);
+    const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => setName(e.target.value);
+    const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => setAmount(Math.floor(Number(e.target.value)));
 
     /**
      * Refresh the balance of the contract
      */
     const refreshBalance = async () => {
-        const rawBalance: bigint = await contract.read.getBalance();
+        // cancel if no contract is set
+        if (!contract) return;
+        const rawBalance: bigint = await contract.read.getBalance() as bigint;
         const balance: number = Number(ethers.utils.formatEther(rawBalance));
         setRawBalance(rawBalance);
         setBalance(balance);
@@ -177,12 +179,16 @@ export default function PageContent() {
      * Withdraw all the funds from the contract to the owner address
      */
     const withdraw = async () => {
+        // cancel if no contract is set
+        if (!contract) return;
         // cancel if no account is not connected
         if (!account) return;
         // cancel if account is the owner
         if (!(account === owner)) return;
         // withdraw all and show a toast messages on success
         try {
+            // this is a limitation in the current version of the library
+            // @ts-ignore
             await contract.write.withdrawAll();
             toast.success('Withdraw success');
         } catch (error) {
@@ -197,8 +203,11 @@ export default function PageContent() {
      * - This method submits a transaction to the contract address with a contract call 'buy-coffee'
      * - On call success we display a toast message and add the incoming transaction to our existing list of transactions
      */
-    const handleSubmit = async e => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        // cancel if no contract is set
+        if (!contract) return;
+        // cancel if no account is not connected
         if (!account) return;
         setLoading(true);
         try {
@@ -210,8 +219,14 @@ export default function PageContent() {
                 value: value,
                 account: account.address
             };
+            // this is a limitation in the current version of the library
+            // @ts-ignore
             const {estimate} = await contract.estimateGas.giveCoffee(args, opts)
+            // this is a limitation in the current version of the library
+            // @ts-ignore
             const {simulate} = await contract.simulate.giveCoffee(args, opts)
+            // this is a limitation in the current version of the library
+            // @ts-ignore
             const {hash} = await contract.write.giveCoffee(args, opts);
             toast.success('Thank you for the support! Your donation will be processed soon.');
             // clear the form values
@@ -231,6 +246,8 @@ export default function PageContent() {
      * Fetching list of coffees
      */
     const listCoffees = async () => {
+        // cancel if no contract is set
+        if (!contract) return;
         const c: number = Number(await contract.read.coffeeCount());
         if (c > 0) {
             try {
@@ -239,6 +256,8 @@ export default function PageContent() {
                 const offset = c > limit ? c - limit + 1 : 1;
                 const args = [offset, limit];
                 const opts = {};
+                // this is a limitation in the current version of the library
+                // @ts-ignore
                 const results: TransactionResult[] = await contract.read.listCoffees(args, opts);
                 const donors: Donor[] = mapResultsFromTx(results);
                 setDonorsCount(c);
@@ -259,10 +278,11 @@ export default function PageContent() {
      * - This method subscribes to the contract events and updates the donors list and balance on event
      */
     const subscribeToEvents = () => {
-
+        // cancel if no contract is set
+        if (!contract) return;
         const args = {
-            address: contract.address,
-            abi: contractABI,
+            address: contract.address as Address,
+            abi: contractABI as Abi,
         };
 
         /////////////////////
@@ -273,8 +293,9 @@ export default function PageContent() {
             events.coffeeGiven.event();
         }
         const _cg = watchContractEvent({...args, ...{eventName: 'CoffeeGiven'}},
-            (event) => {
+            (event: WatchContractEventOnLogsParameter) => {
                 // map event results to a Donor object
+                // @ts-ignore
                 const args = event[0].args;
                 const donor: Donor = mapResultsFromTx([{
                     id: args.id,
@@ -367,7 +388,7 @@ export default function PageContent() {
      * Hook to clear all the state when the user disconnects
      */
     useEffect(() => {
-        if(isDisconnected){
+        if (isDisconnected) {
             disconnect();
         }
     }, [isDisconnected]);
@@ -378,7 +399,7 @@ export default function PageContent() {
             animate={{opacity: 1, scale: 1}}
             transition={{duration: 0.5}}
         >
-            <AppNavbar />
+            <AppNavbar/>
             <Container>
                 <div className="md:flex justify-center pt-8 max-w mb-8">
                     <div className="flex flex-col mx-auto mt-8">

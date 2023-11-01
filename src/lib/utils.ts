@@ -39,14 +39,15 @@ export const getError = (error: any): [number, string] => {
     let _message: string = "";
     let _error: any = null;
     if (error instanceof BaseError) {
-        const revertError = error.walk(err => err instanceof ContractFunctionRevertedError)
-        const executionError = error.walk(err => err instanceof ContractFunctionExecutionError)
+        const revertError: Error|null = error.walk(err => err instanceof ContractFunctionRevertedError)
+        const executionError: Error|null = error.walk(err => err instanceof ContractFunctionExecutionError)
         if(executionError instanceof ContractFunctionExecutionError) {
             _code = 2;
             _message = executionError?.details?.split("##")[1];
-        } else if (revertError instanceof ContractFunctionRevertedError) {
+        } else if (revertError instanceof ContractFunctionRevertedError && revertError?.data?.args) {
             _code = 1;
-            _message = revertError?.data.args[0].split("##")[1];
+            // @ts-ignore
+            _message = revertError?.data?.args[0].split("##")[1];
         }
     } else {
         _code = error?.data?.code ?? error?.code ?? 0;

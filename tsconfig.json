@@ -1,19 +1,18 @@
 {
   "compilerOptions": {
     "lib": [
-      "ES2018",
+      "es2020","esnext",
       "dom"
     ],
     "module": "CommonJS",
-    "target": "ES2018",
+    "target": "es2020",
     "strict": true,
     "esModuleInterop": true,
     "types": [
-      "@types/node"
     ],
     "typeRoots": [
       "./node_modules/@types",
-      "./types"
+      "./types",
     ],
     "allowJs": true,
     "skipLibCheck": true,

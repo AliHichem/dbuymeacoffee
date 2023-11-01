@@ -4,11 +4,18 @@ const nextConfig = {
     // output: 'export',
     distDir: 'build',
     reactStrictMode: true,
-    webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    webpack: (config, context) => {
         config.externals.push({
             'utf-8-validate': 'commonjs utf-8-validate',
             'bufferutil': 'commonjs bufferutil',
         });
+        if (config.plugins) {
+            config.plugins.push(
+                new context.webpack.IgnorePlugin({
+                    resourceRegExp: /^(lokijs|pino-pretty|encoding)$/,
+                }),
+            )
+        }
         return config;
     },
     env: {
