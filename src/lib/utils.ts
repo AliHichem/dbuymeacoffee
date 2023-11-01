@@ -43,7 +43,7 @@ export const getError = (error: any): [number, string] => {
         const executionError: Error|null = error.walk(err => err instanceof ContractFunctionExecutionError)
         if(executionError instanceof ContractFunctionExecutionError) {
             _code = 2;
-            _message = executionError?.details?.split("##")[1];
+            _message = executionError?.shortMessage?.split("##")[1];
         } else if (revertError instanceof ContractFunctionRevertedError && revertError?.data?.args) {
             _code = 1;
             // @ts-ignore

@@ -94,8 +94,6 @@ export default function PageContent() {
             abi: contractABI as Abi,
             walletClient: wallet
         });
-        console.log(contract.constructor.name);
-        console.log(contract);
         const owner: string = (await contract.read.owner()) as string;
         await setOwner(owner);
         setNetwork(network);
@@ -404,7 +402,7 @@ export default function PageContent() {
                 <div className="md:flex justify-center pt-8 max-w mb-8">
                     <div className="flex flex-col mx-auto mt-8">
                         <Image
-                            src="/images/Buy_Me_a_Coffee_Logo.png"
+                            src="images/Buy_Me_a_Coffee_Logo.png"
                             width={60}
                             height={30}
                             alt="Picture of the author"
