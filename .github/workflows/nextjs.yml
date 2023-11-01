@@ -77,10 +77,10 @@ jobs:
       - name: 'Create env file'
         run: |
           touch .env
-          echo CONTRACT_ADDRESS_DEVNET=${{ secrets.CONTRACT_ADDRESS_DEVNET }} >> .env
-          echo CONTRACT_ADDRESS_TESTNET=${{ env.CONTRACT_ADDRESS_TESTNET }} >> .env
-          echo CONTRACT_ADDRESS_MAINNET=$CONTRACT_ADDRESS_MAINNET >> .env
-          echo NEXT_PUBLIC_NETWORK=${{ vars.NEXT_PUBLIC_NETWORK }} >> .env
+          echo "CONTRACT_ADDRESS_DEVNET=${{ secrets.CONTRACT_ADDRESS_DEVNET }}" >> .env
+          echo "CONTRACT_ADDRESS_TESTNET=${{ env.CONTRACT_ADDRESS_TESTNET }}" >> .env
+          echo "CONTRACT_ADDRESS_MAINNET=$CONTRACT_ADDRESS_MAINNET" >> .env
+          echo "NEXT_PUBLIC_NETWORK=${{ vars.NEXT_PUBLIC_NETWORK }}" >> .env
           echo ETHER_UNIT=${{ vars.ETHER_UNIT }} >> .env
           echo COFFEES_LISTING_LIMIT=$COFFEES_LISTING_LIMIT >> .env
           cat .env
