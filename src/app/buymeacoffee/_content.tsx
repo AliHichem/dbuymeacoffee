@@ -18,7 +18,11 @@ import {
 import {
     mapResultsFromTx,
     profile,
-    getError, TransactionResult, Donor, getNetwork, NetworkMap
+    getError,
+    TransactionResult,
+    Donor,
+    getNetwork,
+    NetworkMap
 } from '@/lib';
 import {IconLoader2} from '@tabler/icons';
 import {motion} from "framer-motion"
@@ -40,7 +44,14 @@ import {
     Address,
     GetContractResult,
 } from '@wagmi/core'
-import {parseEther, createWalletClient, custom, Transport, Abi, WatchContractEventOnLogsParameter} from "viem";
+import {
+    parseEther,
+    createWalletClient,
+    custom,
+    Transport,
+    Abi,
+    WatchContractEventOnLogsParameter
+} from "viem";
 
 type EthereumProvider = { request(...args: any): Promise<any> }
 
@@ -191,8 +202,10 @@ export default function PageContent() {
             toast.success('Withdraw success');
         } catch (error) {
             const [_code, _message] = getError(error);
-            toast.error(`${_code}: ${_message}`);
-            console.error("SM.Error:", _message, _code);
+            if(_message) {
+                toast.error(`${_code}: ${_message}`);
+                console.error("SM.Error:", _message, _code);
+            }
         }
     };
 
@@ -234,8 +247,10 @@ export default function PageContent() {
         } catch (error) {
             setLoading(false);
             const [_code, _message] = getError(error);
-            toast.error(`${_code}: ${_message}`);
-            // console.trace("SM.Error:", _message, _code);
+            if(_message) {
+                toast.error(`${_code}: ${_message}`);
+                // console.trace("SM.Error:", _message, _code);
+            }
         }
         setLoading(false);
     };
@@ -261,10 +276,11 @@ export default function PageContent() {
                 setDonorsCount(c);
                 setDonors(donors);
             } catch (error) {
-                console.log('@@@@ Vanilla Js Error: ',error);
                 const [_code, _message] = getError(error);
-                toast.error(`${_code}: ${_message}`);
-                console.error("SM.Error:", _message, _code);
+                if(_message) {
+                    toast.error(`${_code}: ${_message}`);
+                    console.error("SM.Error:", _message, _code);
+                }
             }
         } else {
             setDonors([]);
