@@ -261,6 +261,7 @@ export default function PageContent() {
                 setDonorsCount(c);
                 setDonors(donors);
             } catch (error) {
+                console.log('@@@@ Vanilla Js Error: ',error);
                 const [_code, _message] = getError(error);
                 toast.error(`${_code}: ${_message}`);
                 console.error("SM.Error:", _message, _code);
@@ -357,13 +358,6 @@ export default function PageContent() {
     useEffect(() => {
         if (typeof window !== "undefined") {
             setMounted(true)
-            console.log('process.env',process.env.NEXT_PUBLIC_COFFEES_LISTING_LIMIT);
-            console.log('process.env',process.env.NEXT_PUBLIC_ETHER_UNIT);
-            console.log('process.env',process.env.NEXT_PUBLIC_NEXT_PUBLIC_NETWORK);
-            console.log('process.env',process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_TESTNET);
-            console.log('process.env',process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MAINNET);
-            console.log('process.env',process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_DEVNET);
-            console.log('process.env',process.env.CONTRACT_ADDRESS_DEVNET);
         }
     }, []);
 
