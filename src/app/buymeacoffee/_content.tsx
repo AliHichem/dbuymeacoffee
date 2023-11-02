@@ -52,6 +52,7 @@ import {
     Abi,
     WatchContractEventOnLogsParameter
 } from "viem";
+import {WalletClient} from "viem/clients/createWalletClient";
 
 type EthereumProvider = { request(...args: any): Promise<any> }
 
@@ -105,7 +106,7 @@ export default function PageContent() {
                 address: network.contractAddress as Address,
                 abi: contractABI as Abi,
                 // walletClient: wallet
-                walletClient: walletClient
+                walletClient: walletClient as WalletClient
             });
             const owner: string = (await contract.read.owner()) as string;
             await setOwner(owner);
