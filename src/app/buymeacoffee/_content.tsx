@@ -90,25 +90,30 @@ export default function PageContent() {
      * updated when the user changes the network or change the account
      */
     const updateContract = async () => {
-        await setContract(null);
-        await setNetwork(null);
-        const account: GetAccountResult = await getAccount();
-        const viemNetwork: GetNetworkResult = await viemGetNetwork();
-        const wallet = createWalletClient({
-            account: account.address as Address,
-            chain: viemNetwork?.chain,
-            transport: custom(window.ethereum as EthereumProvider) as Transport
-        })
-        const network:NetworkMap = getNetwork(viemNetwork.chain);
-        const contract: GetContractResult = getContract({
-            address: network.contractAddress as Address,
-            abi: contractABI as Abi,
-            walletClient: wallet
-        });
-        const owner: string = (await contract.read.owner()) as string;
-        await setOwner(owner);
-        setNetwork(network);
-        setContract(contract);
+        try {
+            await setContract(null);
+            await setNetwork(null);
+            // const account: GetAccountResult = await getAccount();
+            const viemNetwork: GetNetworkResult = await viemGetNetwork();
+            // const wallet = createWalletClient({
+            //     account: account.address as Address,
+            //     chain: viemNetwork?.chain,
+            //     transport: custom(window.ethereum as EthereumProvider) as Transport
+            // })
+            const network: NetworkMap = getNetwork(viemNetwork.chain);
+            const contract: GetContractResult = getContract({
+                address: network.contractAddress as Address,
+                abi: contractABI as Abi,
+                // walletClient: wallet
+                walletClient: walletClient
+            });
+            const owner: string = (await contract.read.owner()) as string;
+            await setOwner(owner);
+            setNetwork(network);
+            setContract(contract);
+        } catch (error) {
+            console.error("CreateContract.Error:", error);
+        }
     };
 
     /**
@@ -202,7 +207,7 @@ export default function PageContent() {
             toast.success('Withdraw success');
         } catch (error) {
             const [_code, _message] = getError(error);
-            if(_message) {
+            if (_message) {
                 toast.error(`${_code}: ${_message}`);
                 console.error("SM.Error:", _message, _code);
             }
@@ -247,7 +252,7 @@ export default function PageContent() {
         } catch (error) {
             setLoading(false);
             const [_code, _message] = getError(error);
-            if(_message) {
+            if (_message) {
                 toast.error(`${_code}: ${_message}`);
                 // console.trace("SM.Error:", _message, _code);
             }
@@ -277,7 +282,7 @@ export default function PageContent() {
                 setDonors(donors);
             } catch (error) {
                 const [_code, _message] = getError(error);
-                if(_message) {
+                if (_message) {
                     toast.error(`${_code}: ${_message}`);
                     console.error("SM.Error:", _message, _code);
                 }
@@ -357,7 +362,7 @@ export default function PageContent() {
      * Hook to update the contract and network state when the connector is updated
      */
     useEffect(() => {
-        if (connector) {
+        if (connector && walletClient) {
             connector.on('change', handleConnectorUpdate)
         }
         return () => {
@@ -365,7 +370,7 @@ export default function PageContent() {
                 connector.off('change', handleConnectorUpdate)
             }
         }
-    }, [connector])
+    }, [connector, walletClient])
 
     /**
      * Initialize web3Modal once the component is mounted

@@ -68,7 +68,6 @@ export const getError = (error: any): [number, string] => {
         // keep all string after the first "##"
         _message = _error?.split("##")[1];
     }
-    console.log('>>>>> error.constructor.name <<<<', error.constructor.name);
     //if _message is empty or undefined throw full error
     if (_message === undefined || _message === "") {
         console.log('@@@@ Vanilla Js Error: ', error);
