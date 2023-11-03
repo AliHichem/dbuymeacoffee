@@ -39,22 +39,16 @@ import {
     getAccount,
     watchContractEvent,
     getNetwork as viemGetNetwork,
-    GetAccountResult,
     GetNetworkResult,
     Address,
     GetContractResult,
 } from '@wagmi/core'
 import {
     parseEther,
-    createWalletClient,
-    custom,
-    Transport,
     Abi,
     WatchContractEventOnLogsParameter
 } from "viem";
 import {WalletClient} from "viem/clients/createWalletClient";
-
-type EthereumProvider = { request(...args: any): Promise<any> }
 
 const coffeesLimit: number = Number(process.env.NEXT_PUBLIC_COFFEES_LISTING_LIMIT);
 const etherUnit: number = Number(process.env.NEXT_PUBLIC_ETHER_UNIT);
@@ -70,7 +64,7 @@ export default function PageContent() {
         isConnected
     } = useAccount();
     const {data: walletClient, isError, isLoading} = useWalletClient();
-    const [mounted, setMounted] = useState<boolean>(false); // looks unused but do not remove it !
+    const [mounted, setMounted] = useState<boolean>(false); // used to prevent SSR issues with web3Modal
     const [donors, setDonors] = useState<Donor[]>([]);
     const [donorsCount, setDonorsCount] = useState<number>(0);
     const [name, setName] = useState<string>('');
@@ -94,18 +88,11 @@ export default function PageContent() {
         try {
             await setContract(null);
             await setNetwork(null);
-            // const account: GetAccountResult = await getAccount();
             const viemNetwork: GetNetworkResult = await viemGetNetwork();
-            // const wallet = createWalletClient({
-            //     account: account.address as Address,
-            //     chain: viemNetwork?.chain,
-            //     transport: custom(window.ethereum as EthereumProvider) as Transport
-            // })
             const network: NetworkMap = getNetwork(viemNetwork.chain);
             const contract: GetContractResult = getContract({
                 address: network.contractAddress as Address,
                 abi: contractABI as Abi,
-                // walletClient: wallet
                 walletClient: walletClient as WalletClient
             });
             const owner: string = (await contract.read.owner()) as string;

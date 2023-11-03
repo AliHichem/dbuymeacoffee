@@ -2,7 +2,7 @@
 
 import {createWeb3Modal, defaultWagmiConfig} from '@web3modal/wagmi/react'
 import {WagmiConfig} from 'wagmi'
-import {arbitrum, sepolia, mainnet, localhost} from 'wagmi/chains'
+import {sepolia, mainnet, localhost, Chain} from 'wagmi/chains'
 import {useState} from "react";
 import PageContent from "./_content";
 
@@ -14,7 +14,15 @@ const metadata = {
     icons: ['https://avatars.mywebsite.com/']
 }
 
-const chains = [localhost, sepolia, mainnet]
+let chains: Chain[] = [];
+// check for supported chains from NEXT_PUBLIC_SUPPORTED_CHAINS
+// @ts-ignore
+const supportedChains: string[] = process.env.NEXT_PUBLIC_SUPPORTED_CHAINS.split(',').map(chain => chain.trim());
+
+if(supportedChains.indexOf('localhost') !== -1) chains.push(localhost);
+if(supportedChains.indexOf('sepolia') !== -1) chains.push(sepolia);
+if(supportedChains.indexOf('mainnet') !== -1) chains.push(mainnet);
+
 const wagmiConfig = defaultWagmiConfig({chains, projectId, metadata})
 
 createWeb3Modal({
