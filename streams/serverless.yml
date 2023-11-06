@@ -1,4 +1,3 @@
-org: hikemu
 app: dbuymeacoffee
 service: aws-dbuymeacoffee-streams
 
