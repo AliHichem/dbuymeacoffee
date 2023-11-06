@@ -1,0 +1,46 @@
+name: Deploy Python stream handler to Lambda Function
+
+
+env:
+    PYTHON_VERSION: '3.11'              # set this to the Python version to use
+
+
+on:
+    push:
+        branches: [ master ]
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./streams
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Set up Python version
+              uses: actions/setup-python@v3.0.0
+              with:
+                  python-version: ${{ env.PYTHON_VERSION }}
+                  cache: 'pip'
+
+            - name: Create and start virtual environment
+              run: |
+                  python -m venv venv
+                  source venv/bin/activate
+
+            - name: Install dependencies
+              run: pip install -r requirements.txt
+
+            - name: Install Serverless Framework & plugins
+              run: |
+                    npm install -g serverless
+                    npm install
+
+            - name: Set AWS credentials
+              run: serverless config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+            - name: Deploy Lambda function
+              run: serverless  deploy --aws-profile=hikemu --param="emailPass={{ secrets.EMAIL_PASS }}"

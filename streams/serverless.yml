@@ -1,0 +1,38 @@
+org: hikemu
+app: dbuymeacoffee
+service: aws-dbuymeacoffee-streams
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-west-2
+  memorySize: 128
+  stage: dev
+  profile: hikemu
+  environment:
+    EMAIL_USER: hichem.ali.tmp@gmail.com
+    EMAIL_PASS: ${param:emailPass}
+    EMAIL_RECEIVER: hichem.ali.tmp@gmail.com
+    EMAIL_SUBJECT: New Donation
+
+plugins:
+  - serverless-wsgi
+  - serverless-python-requirements
+
+custom:
+  wsgi:
+    app: backend.app
+    packRequirements: false
+  pythonRequirements:
+    dockerizePip: non-linux
+
+functions:
+  app:
+    handler: wsgi_handler.handler
+    events:
+      - httpApi: '*'
+#      - http: ANY /
+#      - http: 'ANY {proxy+}'
+    disableLogs: false

@@ -63,3 +63,5 @@ next-env.d.ts
 #python scripts venv
 streams/venv
 streams/.env
+streams/.serverless
+streams/__pycache__
