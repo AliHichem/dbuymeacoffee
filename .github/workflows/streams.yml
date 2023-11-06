@@ -41,5 +41,6 @@ jobs:
 
             - name: Set AWS credentials && Deploy Lambda function
               run: |
+                  aws configure --profile hikemu --region us-west-2 --access-key-id ${{ secrets.AWS_ACCESS_KEY_ID }} --secret-access-key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   serverless config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   serverless  deploy --aws-profile=hikemu --param="emailPass={{ secrets.EMAIL_PASS }}"
