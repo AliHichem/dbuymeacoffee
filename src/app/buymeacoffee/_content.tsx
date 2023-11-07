@@ -423,8 +423,22 @@ export default function PageContent() {
                             <div>Hey there !</div>
                         </div>
                         <div className="mt-2 text-sm text-zinc-700 max-w-2xl">
-                            This is a demo app on how to build a simple dapp with Solidity, Next.js
-                            and Ether.js. Feel free grab some testnet ETH from the {''}
+                            This is a demo app on how to build a simple dapp with <span className="text-orange-500 font-semibold hover:underline cursor-pointer">
+          <NewTabLink
+              href="https://soliditylang.org/">
+            Solidity
+          </NewTabLink>
+        </span>, <span className="text-orange-500 font-semibold hover:underline cursor-pointer">
+          <NewTabLink
+              href="https://nextjs.org/">
+            Next.js
+          </NewTabLink>
+        </span>&nbsp;and <span className="text-orange-500 font-semibold hover:underline cursor-pointer">
+          <NewTabLink
+              href="https://docs.walletconnect.com/web3modal/about">
+            Web3Modal
+          </NewTabLink>
+        </span>. Feel free grab some testnet ETH from the {''}
                             <span className="text-orange-500 font-semibold hover:underline cursor-pointer">
           <NewTabLink href="https://sepoliafaucet.com/">
             SepoliaFaucet
@@ -438,7 +452,7 @@ export default function PageContent() {
         </span>
                             . You can find a source code on{' '}
                             <span className="text-gray-800 font-semibold hover:underline cursor-pointer">
-          <NewTabLink href="https://github.com/AliHichem">
+          <NewTabLink href="https://github.com/AliHichem/dbuymeacoffee">
             Github
           </NewTabLink>
         </span>

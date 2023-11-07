@@ -4,7 +4,7 @@ export const profile = {
   title: 'Hichem Ali',
   description: 'Web3 developer',
   about:
-    'I am a fullstack developer, who is passionate about building web applications with React and Next.js',
+    'I am a fullstack/blockchain developer, who is passionate about building web applications.',
 
   profileImageUrl:
       "/images/ali.jpeg",
