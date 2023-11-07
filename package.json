@@ -31,7 +31,6 @@
     "lint": "next lint"
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "^14.0.1",
     "@openzeppelin/truffle-upgrades": "^1.20.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
