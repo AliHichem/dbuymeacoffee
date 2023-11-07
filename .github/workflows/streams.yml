@@ -44,14 +44,12 @@ jobs:
     deploy:
         runs-on: ubuntu-latest
         needs: build
-        defaults:
-            run:
-                working-directory: ./streams
+#        defaults:
+#            run:
+#                working-directory: ./streams
         steps:
             - name: Install Serverless Framework & plugins
               run: |
-                  ls -al
-                  ls -al streams
                   npm install -g serverless
                   npm install
 
