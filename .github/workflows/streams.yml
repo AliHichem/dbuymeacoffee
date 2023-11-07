@@ -50,6 +50,8 @@ jobs:
         steps:
             - name: Install Serverless Framework & plugins
               run: |
+                  ls -al
+                  ls -al streams
                   npm install -g serverless
                   npm install
 
