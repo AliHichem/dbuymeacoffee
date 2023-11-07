@@ -94,8 +94,8 @@ jobs:
             NEXT_PUBLIC_ETHER_UNIT: ${{ vars.ETHER_UNIT }}
             NEXT_PUBLIC_COFFEES_LISTING_LIMIT: ${{ vars.COFFEES_LISTING_LIMIT }}
             NEXT_PUBLIC_SUPPORTED_CHAINS: ${{ vars.SUPPORTED_CHAINS }}
-      - name: Static HTML export with Next.js
-        run: ${{ steps.detect-package-manager.outputs.runner }} next export
+#      - name: Static HTML export with Next.js
+#        run: ${{ steps.detect-package-manager.outputs.runner }} next export
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
