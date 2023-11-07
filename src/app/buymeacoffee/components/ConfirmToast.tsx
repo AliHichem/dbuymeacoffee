@@ -4,7 +4,7 @@ import classnames from 'classnames-creator'
 
 // typeqcript ignore
 // @ts-ignore
-import s from '@/styles/ConfirmToast.module.scss'
+import s from '@/app/styles/ConfirmToast.module.scss'
 
 interface Props {
     asModal?: boolean,

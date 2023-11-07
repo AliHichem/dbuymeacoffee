@@ -23,7 +23,7 @@ import {
     Donor,
     getNetwork,
     NetworkMap
-} from '@/lib';
+} from '@/app/lib';
 import {IconLoader2} from '@tabler/icons';
 import {motion} from "framer-motion"
 import toast from 'react-hot-toast';

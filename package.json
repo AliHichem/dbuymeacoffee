@@ -7,18 +7,11 @@
     "@headlessui/react": "^1.7.3",
     "@openzeppelin/contracts": "^4.9.3",
     "@openzeppelin/contracts-upgradeable": "^4.9.3",
-    "@stacks/connect": "^7.0.0",
     "@tabler/icons": "^1.93.0",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
     "@wagmi/core": "^1.4.5",
     "@web3modal/wagmi": "^3.1.0",
-    "autoprefixer": "10.4.15",
     "classnames": "^2.3.1",
     "classnames-creator": "^1.0.6",
-    "eslint": "8.47.0",
-    "eslint-config-next": "13.4.19",
     "ethers": "^5.7.2",
     "framer-motion": "^10.16.1",
     "next": "^13.5.3",
@@ -27,9 +20,6 @@
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^4.11.0",
-    "sass": "^1.66.1",
-    "tailwindcss": "3.3.3",
-    "typescript": "^5.0.4",
     "viem": "^1.17.1",
     "wagmi": "^1.4.5",
     "web-vitals": "^2.1.4"
@@ -42,9 +32,18 @@
   },
   "devDependencies": {
     "@openzeppelin/truffle-upgrades": "^1.20.1",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
     "@types/node": "^20.6.0",
+    "autoprefixer": "10.4.15",
     "chai": "^4.3.7",
-    "chai-as-promised": "^7.1.1"
+    "chai-as-promised": "^7.1.1",
+    "eslint": "8.47.0",
+    "eslint-config-next": "13.4.19",
+    "sass": "^1.66.1",
+    "tailwindcss": "3.3.3",
+    "typescript": "^5.0.4"
   },
   "eslintConfig": {
     "extends": [

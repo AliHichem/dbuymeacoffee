@@ -3,9 +3,9 @@
 import Link from "next/link";
 import {motion} from "framer-motion"
 
-import '@/assets/css/icomoon.css'
-import '@/assets/css/bootstrap.css'
-import '@/assets/css/style.css'
+import '@/app/assets/css/icomoon.css'
+import '@/app/assets/css/bootstrap.css'
+import '@/app/assets/css/style.css'
 import {Kaushan_Script} from "next/font/google";
 const kaushanScript = Kaushan_Script({subsets: ['latin-ext'], weight: '400'});
 

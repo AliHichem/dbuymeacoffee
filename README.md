@@ -8,16 +8,14 @@ It is based on:
 - The [Truffle](https://www.trufflesuite.com/) framework for developing, testing and deploying smart contracts.
 - [NextJs](https://nextjs.org/) for the frontend.
 - Smart contracts are written in [Solidity](https://solidity.readthedocs.io/en/v0.6.12/).
+- [OpenZeppelin](https://openzeppelin.com/) for the smart contract library.
 - [Python3](https://www.python.org/downloads/) for the stream backend used to send email notifications.
 - [Ganache](https://www.trufflesuite.com/ganache) for the local blockchain.
-- [IPFS](https://ipfs.io/) for storing the frontend.
-- [Infura](https://infura.io/) for the Ethereum node.
 - [Mortalis](https://moralis.io/) for the backend.
-- [ngrok](https://ngrok.com/) for the tunneling.
+- [ngrok](https://ngrok.com/) for the tunneling (dev only).
 - [Metamask](https://metamask.io/) for the wallet.
-- [Web3.js](https://web3js.readthedocs.io/en/v1.3.4/) for the interaction with the smart contract.
+- [Web3modal](https://docs.walletconnect.com/web3modal/about) v3 for the interaction with the smart contract.
 - [Etherscan](https://etherscan.io/) for the smart contract verification.
-- [OpenZeppelin](https://openzeppelin.com/) for the smart contract library.
 
 ## System requirements
 
@@ -49,6 +47,7 @@ I like to use [Truffle Dashboard](https://trufflesuite.com/docs/truffle/how-to/u
 
 - `yarn install`
 - `yarn run dev` (to start the dev server)
+- `yarn build` (to build the app, export is automated)'
 
 ## Mortalis  Streams backend    
 In order to get email notification you should have your smart contract events sent to a backend. I use [Mortalis](https://moralis.io/) for this.
@@ -65,3 +64,11 @@ In order to get email notification you should have your smart contract events se
 - `python3 backend.py`
 - In a new terminal: `ngrok http 5000` (this will create a tunnel to your localhost:3000).
 - From Ngrok, copy the url and set it as the webhook url in moralis.
+
+## Deployment
+
+- SmartContract: @see above the truffle dashboard section.
+- Frontend: I use github actions to push nextjs front, @see .github/workflows/nextjs.yml
+- Streams backend: I use github actions to deploy to AWS Lambda using Serverless framework, @see .github/workflows/streams.yml
+
+Almost everything is automated and could be deployed for free (yes github pages and aws lambda are free under certain limit) except if you deploy your smart contract to the mainnet, in this case you will have to pay for the gas fees.

@@ -1,4 +1,4 @@
-import '@/assets/css/globals.css'
+import '@/app/assets/css/globals.css'
 import {Ubuntu} from 'next/font/google'
 import {Toaster} from 'react-hot-toast';
 
