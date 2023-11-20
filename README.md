@@ -1,7 +1,7 @@
 ![alt text](https://upload.wikimedia.org/wikipedia/en/5/5c/Buy_Me_a_Coffee_Logo.png)
 # Decentrelized "Buy me a coffee" app on the Ethereum blockchain.
 
-
+([live demo here](https://alihichem.github.io/dbuymeacoffee/))
 
 This is a simple decentralized app (Dapp) that allows you to receive donations in Ether (ETH) on the Ethereum blockchain. 
 It is based on:
@@ -11,7 +11,7 @@ It is based on:
 - [OpenZeppelin](https://openzeppelin.com/) for the smart contract library.
 - [Python3](https://www.python.org/downloads/) for the stream backend used to send email notifications.
 - [Ganache](https://www.trufflesuite.com/ganache) for the local blockchain.
-- [Mortalis](https://moralis.io/) for the backend.
+- [Moralis](https://moralis.io/) for the backend.
 - [ngrok](https://ngrok.com/) for the tunneling (dev only).
 - [Metamask](https://metamask.io/) for the wallet.
 - [Web3modal](https://docs.walletconnect.com/web3modal/about) v3 for the interaction with the smart contract.
